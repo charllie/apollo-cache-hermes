@@ -1,0 +1,27 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+  "files.exclude": {
+    "**/*.js.map": true,
+    "**/.DS_Store": true,
+    "**/.git": true,
+    "**/.hg": true,
+    "**/.svn": true,
+    "**/CVS": true,
+    "{src,test}/**/*.d.ts": true,
+    "{src,test}/**/*.js": true,
+    "node_modules/": true,
+    "output/": true
+  },
+  "eslint.validate": [
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.options": {
+    "reportUnusedDisableDirectives": true
+  },
+  "jsDocCompletion.enabled": false,
+  "todohighlight.keywordsPattern": "TODO(\\(\\w+\\))?:",
+  "cSpell.words": [
+    "queryable"
+  ]
+}

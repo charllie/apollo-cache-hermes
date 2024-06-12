@@ -1,0 +1,14 @@
+.npmrc
+
+# MacOS
+**/.DS_Store
+
+# Node
+/node_modules/
+
+# Build Artifacts
+/output/
+!/scripts/*.js
+
+# TypeScript
+!/typings/**/*.d.ts
