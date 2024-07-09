@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.nodeIdForParameterizedValue = exports.SnapshotEditor = void 0;
 var tslib_1 = require("tslib");
+var lodash = require("lodash");
 var equality_1 = tslib_1.__importDefault(require("@wry/equality"));
 var errors_1 = require("../errors");
 var GraphSnapshot_1 = require("../GraphSnapshot");
@@ -390,7 +391,7 @@ var SnapshotEditor = /** @class */ (function () {
      */
     SnapshotEditor.prototype._buildNewSnapshot = function () {
         var entityTransformer = this._context.entityTransformer;
-        var snapshots = tslib_1.__assign({}, this._parent._values);
+        var snapshots = lodash.clone(this._parent._values);
         for (var id in this._newNodes) {
             var newSnapshot = this._newNodes[id];
             // Drop snapshots that were garbage collected.
