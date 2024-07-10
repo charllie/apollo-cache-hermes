@@ -15,9 +15,6 @@ parse_version() {
 end_script
 }
 
-# Make sure we have all tags available
-git fetch origin --tags
-
 VERSION_TEMPLATE=$(node -p "JSON.parse(fs.readFileSync('package.json')).version")
 TEMPLATE_PARTS=($(parse_version "${VERSION_TEMPLATE}"))
 
@@ -31,7 +28,3 @@ echo "Releasing ${NEW_VERSION}…"
 write_package_key version "${NEW_VERSION}"
 
 npm publish
-
-git tag v${NEW_VERSION} -m "${CIRCLE_BUILD_URL}"
-git push --tags
-git reset --hard HEAD\^
