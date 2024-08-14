@@ -4,12 +4,7 @@
     "downlevelIteration": true,
     "importHelpers": true,
     "inlineSourceMap": true,
-    "lib": [
-      "dom",
-      "es2015",
-      "esnext.asynciterable",
-      "scripthost"
-    ],
+    "lib": ["dom", "es2015", "esnext.asynciterable", "scripthost"],
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -22,6 +17,7 @@
     "pretty": true,
     "strict": true,
     "suppressImplicitAnyIndexErrors": true,
-    "target": "es5"
+    "target": "es5",
+    "outDir": "dist"
   }
 }

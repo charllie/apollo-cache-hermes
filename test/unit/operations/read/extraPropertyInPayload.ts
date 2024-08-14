@@ -4,7 +4,6 @@ import { QueryResult, read, write } from '../../../../src/operations';
 import { query, strictConfig } from '../../../helpers';
 
 describe(`operations.read`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
   const shipmentsQuery = query(`{
@@ -25,7 +24,6 @@ describe(`operations.read`, () => {
   }`);
 
   describe(`incomplete payload`, () => {
-
     let snapshot: GraphSnapshot;
     let readResult: QueryResult;
 
@@ -37,41 +35,36 @@ describe(`operations.read`, () => {
             driver: {
               name: 'Bob',
               id: 'Bob-d0',
-              messages: [
-                { details: 'Hello' },
-                { details: 'world' },
-              ],
+              messages: [{ details: 'Hello' }, { details: 'world' }]
             },
             stopEtaSummary: [
               {
                 id: 'eta0',
-                type: 'warning',
+                type: 'warning'
               },
               {
                 id: 'eta1',
-                type: 'warning',
-              },
+                type: 'warning'
+              }
             ],
-            extraProp: 'Oh mind!',
+            extraProp: 'Oh mind!'
           },
           {
             id: '1',
             driver: {
               name: 'Joe',
               id: 'Joe-d1',
-              messages: [
-                { details: 'Hello' },
-              ],
+              messages: [{ details: 'Hello' }]
             },
             stopEtaSummary: [
               {
                 id: 'eta0',
-                type: 'warning',
-              },
+                type: 'warning'
+              }
             ],
-            extraObject: 'WAT!!!',
-          },
-        ],
+            extraObject: 'WAT!!!'
+          }
+        ]
       }).snapshot;
       readResult = read(context, shipmentsQuery, snapshot);
     });
@@ -88,42 +81,35 @@ describe(`operations.read`, () => {
             driver: {
               name: 'Bob',
               id: 'Bob-d0',
-              messages: [
-                { details: 'Hello' },
-                { details: 'world' },
-              ],
+              messages: [{ details: 'Hello' }, { details: 'world' }]
             },
             stopEtaSummary: [
               {
                 id: 'eta0',
-                type: 'warning',
+                type: 'warning'
               },
               {
                 id: 'eta1',
-                type: 'warning',
-              },
-            ],
+                type: 'warning'
+              }
+            ]
           },
           {
             id: '1',
             driver: {
               name: 'Joe',
               id: 'Joe-d1',
-              messages: [
-                { details: 'Hello' },
-              ],
+              messages: [{ details: 'Hello' }]
             },
             stopEtaSummary: [
               {
                 id: 'eta0',
-                type: 'warning',
-              },
-            ],
-          },
-        ],
+                type: 'warning'
+              }
+            ]
+          }
+        ]
       });
     });
-
   });
-
 });

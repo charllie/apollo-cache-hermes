@@ -3,7 +3,6 @@ import gql from 'graphql-tag';
 import { selectionSetIsStatic } from '../../../../src';
 
 describe(`ast.selectionSetIsStatic`, () => {
-
   function selection(source: string) {
     const definition = gql(source).definitions[0];
     if ('selectionSet' in definition) {
@@ -13,7 +12,9 @@ describe(`ast.selectionSetIsStatic`, () => {
   }
 
   it(`considers truly static fragments as static`, () => {
-    expect(selectionSetIsStatic(selection(`
+    expect(
+      selectionSetIsStatic(
+        selection(`
       fragment foo on Foo {
         one
         two {
@@ -21,45 +22,69 @@ describe(`ast.selectionSetIsStatic`, () => {
           four
         }
       }
-    `))).to.eq(true);
+    `)
+      )
+    ).to.eq(true);
   });
 
   it(`considers truly static operations as static`, () => {
-    expect(selectionSetIsStatic(selection(`{
+    expect(
+      selectionSetIsStatic(
+        selection(`{
       one
       two {
         three
         four
       }
-    }`))).to.eq(true);
+    }`)
+      )
+    ).to.eq(true);
   });
 
   it(`considers aliases as dynamic`, () => {
-    expect(selectionSetIsStatic(selection(`{
+    expect(
+      selectionSetIsStatic(
+        selection(`{
       one: two
-    }`))).to.eq(false);
+    }`)
+      )
+    ).to.eq(false);
   });
 
   it(`considers parameterized fields as dynamic`, () => {
-    expect(selectionSetIsStatic(selection(`{
+    expect(
+      selectionSetIsStatic(
+        selection(`{
       one(foo: 123)
-    }`))).to.eq(false);
+    }`)
+      )
+    ).to.eq(false);
   });
 
   it(`honors @static when on aliased fields`, () => {
-    expect(selectionSetIsStatic(selection(`{
+    expect(
+      selectionSetIsStatic(
+        selection(`{
       one: two @static
-    }`))).to.eq(true);
+    }`)
+      )
+    ).to.eq(true);
   });
 
   it(`honors @static when on parameterized fields`, () => {
-    expect(selectionSetIsStatic(selection(`{
+    expect(
+      selectionSetIsStatic(
+        selection(`{
       one(foo: 123) @static
-    }`))).to.eq(true);
+    }`)
+      )
+    ).to.eq(true);
   });
 
   it(`honors @static on nested fields`, () => {
-    expect(selectionSetIsStatic(selection(`{
+    expect(
+      selectionSetIsStatic(
+        selection(`{
       one {
         two {
           three: foo @static
@@ -67,21 +92,26 @@ describe(`ast.selectionSetIsStatic`, () => {
           five: baz(fizz: 321) @static
         }
       }
-    }`))).to.eq(true);
+    }`)
+      )
+    ).to.eq(true);
   });
 
   it(`walks inline fragments`, () => {
-    expect(selectionSetIsStatic(selection(`{
+    expect(
+      selectionSetIsStatic(
+        selection(`{
       one {
         ... on Foo {
           three: foo
         }
       }
-    }`))).to.eq(false);
+    }`)
+      )
+    ).to.eq(false);
   });
 
   describe(`selections with fragment spreads`, () => {
-
     const mainSelection = selection(`{
       foo { ...Foo }
     }`);
@@ -95,9 +125,7 @@ describe(`ast.selectionSetIsStatic`, () => {
       });
 
       expect(selectionSetIsStatic(mainSelection, fragmentGetter)).to.eq(false);
-      expect(fragmentGetter.mock.calls).to.deep.eq([
-        ['Foo'],
-      ]);
+      expect(fragmentGetter.mock.calls).to.deep.eq([['Foo']]);
     });
 
     it(`throws for missing fragments`, () => {
@@ -118,13 +146,18 @@ describe(`ast.selectionSetIsStatic`, () => {
 
     it(`walks inline fragments that contain the spread`, () => {
       const fragmentGetter = jest.fn(() => selection(`{ one: foo }`));
-      expect(selectionSetIsStatic(selection(`{
+      expect(
+        selectionSetIsStatic(
+          selection(`{
         one {
           ... on Foo {
             ...Foo
           }
         }
-      }`), fragmentGetter)).to.eq(false);
+      }`),
+          fragmentGetter
+        )
+      ).to.eq(false);
     });
   });
 });

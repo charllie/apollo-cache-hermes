@@ -3,13 +3,13 @@ import { JsonValue } from '../primitive';
 import { RawOperation } from '../schema';
 import {
   DocumentNode,
-  OperationDefinitionNode,
-  OperationTypeNode,
   FragmentMap,
   fragmentMapForDocument,
   getOperationOrDie,
+  OperationDefinitionNode,
+  OperationTypeNode,
   variableDefaultsInOperation,
-  variablesInOperation,
+  variablesInOperation
 } from '../util';
 
 import { CacheContext } from './CacheContext';
@@ -21,7 +21,6 @@ import { CacheContext } from './CacheContext';
  * that information.
  */
 export class QueryInfo {
-
   /** The original document (after __typename fields are injected). */
   public readonly document: DocumentNode;
   /** The primary operation in the document. */
@@ -46,7 +45,7 @@ export class QueryInfo {
    *
    * Variables not present in this map are considered required.
    */
-  public readonly variableDefaults: { [Key: string]: JsonValue }
+  public readonly variableDefaults: { [Key: string]: JsonValue };
 
   constructor(context: CacheContext, raw: RawOperation) {
     this.document = raw.document;
@@ -56,7 +55,11 @@ export class QueryInfo {
     this.operationSource = this.operation.loc && this.operation.loc.source.body;
     this.fragmentMap = fragmentMapForDocument(raw.document);
 
-    const { parsedQuery, variables } = parseQuery(context, this.fragmentMap, this.operation.selectionSet);
+    const { parsedQuery, variables } = parseQuery(
+      context,
+      this.fragmentMap,
+      this.operation.selectionSet
+    );
     this.parsed = parsedQuery;
     this.variables = variables;
     this.variableDefaults = variableDefaultsInOperation(this.operation);
@@ -78,10 +81,15 @@ export class QueryInfo {
 
     if (!messages.length) return;
     const mainMessage = `Validation errors in ${this.operationType} ${this.operationName || '<unknown>'}`;
-    throw new Error(`${mainMessage}:${messages.map(m => `\n * ${m}`).join('')}`);
+    throw new Error(
+      `${mainMessage}:${messages.map(m => `\n * ${m}`).join('')}`
+    );
   }
 
-  private _assertAllVariablesDeclared(messages: string[], declaredVariables: Set<string>) {
+  private _assertAllVariablesDeclared(
+    messages: string[],
+    declaredVariables: Set<string>
+  ) {
     for (const name of this.variables) {
       if (!declaredVariables.has(name)) {
         messages.push(`Variable $${name} is used, but not declared`);
@@ -89,12 +97,14 @@ export class QueryInfo {
     }
   }
 
-  private _assertAllVariablesUsed(messages: string[], declaredVariables: Set<string>) {
+  private _assertAllVariablesUsed(
+    messages: string[],
+    declaredVariables: Set<string>
+  ) {
     for (const name of declaredVariables) {
       if (!this.variables.has(name)) {
         messages.push(`Variable $${name} is unused`);
       }
     }
   }
-
 }

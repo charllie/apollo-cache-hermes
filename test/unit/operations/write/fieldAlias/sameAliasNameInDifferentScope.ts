@@ -11,12 +11,10 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // It just isn't very fruitful to unit test the individual steps of the write
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
 
   describe(`same alias name in different scope`, () => {
-
     let aliasQuery: RawOperation, snapshot: GraphSnapshot;
     beforeAll(() => {
       aliasQuery = query(`{
@@ -37,16 +35,16 @@ describe(`operations.write`, () => {
       snapshot = write(context, empty, aliasQuery, {
         shipment: {
           id: 0,
-          name: 'ToSeattle',
+          name: 'ToSeattle'
         },
         dispatch: {
           id: 2,
-          name: 'Bob The dispatcher',
+          name: 'Bob The dispatcher'
         },
         carrier: {
           id: 1,
-          name: 'Bob',
-        },
+          name: 'Bob'
+        }
       }).snapshot;
     });
 
@@ -54,39 +52,42 @@ describe(`operations.write`, () => {
       jestExpect(snapshot.getNodeData(QueryRootId)).toEqual({
         Shipment: {
           shipmentId: 0,
-          shipmentName: 'ToSeattle',
+          shipmentName: 'ToSeattle'
         },
         Dispatcher: {
           id: 2,
-          name: 'Bob The dispatcher',
+          name: 'Bob The dispatcher'
         },
         Carrier: {
           carrierId: 1,
-          carrierName: 'Bob',
-        },
+          carrierName: 'Bob'
+        }
       });
     });
 
     it(`checks shape of GraphNodeSnapshot`, () => {
       jestExpect(snapshot.getNodeSnapshot(QueryRootId)).toEqual({
         inbound: undefined,
-        outbound: [{ id: '0', path: ['Shipment'] }, { id: '2', path: ['Dispatcher'] }, { id: '1', path: ['Carrier'] }],
+        outbound: [
+          { id: '0', path: ['Shipment'] },
+          { id: '2', path: ['Dispatcher'] },
+          { id: '1', path: ['Carrier'] }
+        ],
         data: {
           Shipment: {
             shipmentId: 0,
-            shipmentName: 'ToSeattle',
+            shipmentName: 'ToSeattle'
           },
           Dispatcher: {
             id: 2,
-            name: 'Bob The dispatcher',
+            name: 'Bob The dispatcher'
           },
           Carrier: {
             carrierId: 1,
-            carrierName: 'Bob',
-          },
-        },
+            carrierName: 'Bob'
+          }
+        }
       });
     });
-
   });
 });

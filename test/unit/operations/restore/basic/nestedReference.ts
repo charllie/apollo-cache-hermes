@@ -3,15 +3,13 @@ import { GraphSnapshot } from '../../../../../src/GraphSnapshot';
 import { EntitySnapshot } from '../../../../../src/nodes';
 import { restore } from '../../../../../src/operations';
 import { JsonObject } from '../../../../../src/primitive';
-import { StaticNodeId, Serializable } from '../../../../../src/schema';
+import { Serializable, StaticNodeId } from '../../../../../src/schema';
 import { createSnapshot, strictConfig } from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 class Three {
-  constructor(
-    public id: string,
-  ) {}
+  constructor(public id: string) {}
 
   getId() {
     return this.id;
@@ -30,21 +28,21 @@ function entityTransformer(node: JsonObject) {
 
 describe(`operations.restore`, () => {
   describe(`nested references`, () => {
-
-    let restoreGraphSnapshot: GraphSnapshot, originalGraphSnapshot: GraphSnapshot;
+    let restoreGraphSnapshot: GraphSnapshot,
+      originalGraphSnapshot: GraphSnapshot;
     beforeAll(() => {
       const cacheContext = new CacheContext({
         ...strictConfig,
-        entityTransformer,
+        entityTransformer
       });
 
       originalGraphSnapshot = createSnapshot(
         {
           one: {
             two: {
-              three: { __typename: 'Three', id: 0 },
-            },
-          },
+              three: { __typename: 'Three', id: 0 }
+            }
+          }
         },
         `{
             one {
@@ -58,22 +56,25 @@ describe(`operations.restore`, () => {
         cacheContext
       ).snapshot;
 
-      restoreGraphSnapshot = restore({
-        [QueryRootId]: {
-          type: Serializable.NodeSnapshotType.EntitySnapshot,
-          outbound: [{ id: '0', path: ['one', 'two', 'three'] }],
-          data: {
-            one: {
-              two: {},
-            },
+      restoreGraphSnapshot = restore(
+        {
+          [QueryRootId]: {
+            type: Serializable.NodeSnapshotType.EntitySnapshot,
+            outbound: [{ id: '0', path: ['one', 'two', 'three'] }],
+            data: {
+              one: {
+                two: {}
+              }
+            }
           },
+          '0': {
+            type: Serializable.NodeSnapshotType.EntitySnapshot,
+            inbound: [{ id: QueryRootId, path: ['one', 'two', 'three'] }],
+            data: { __typename: 'Three', id: 0 }
+          }
         },
-        '0': {
-          type: Serializable.NodeSnapshotType.EntitySnapshot,
-          inbound: [{ id: QueryRootId, path: ['one', 'two', 'three'] }],
-          data: { __typename: 'Three', id: 0 },
-        },
-      }, cacheContext).cacheSnapshot.baseline;
+        cacheContext
+      ).cacheSnapshot.baseline;
     });
 
     it(`restores GraphSnapshot from JSON serializable object`, () => {
@@ -81,8 +82,12 @@ describe(`operations.restore`, () => {
     });
 
     it(`correctly restores different types of NodeSnapshot`, () => {
-      jestExpect(restoreGraphSnapshot.getNodeSnapshot(QueryRootId)).toBeInstanceOf(EntitySnapshot);
-      jestExpect(restoreGraphSnapshot.getNodeSnapshot('0')).toBeInstanceOf(EntitySnapshot);
+      jestExpect(
+        restoreGraphSnapshot.getNodeSnapshot(QueryRootId)
+      ).toBeInstanceOf(EntitySnapshot);
+      jestExpect(restoreGraphSnapshot.getNodeSnapshot('0')).toBeInstanceOf(
+        EntitySnapshot
+      );
     });
 
     it(`correctly restore NodeSnapshot, entity transformation on specific entity`, () => {
@@ -90,8 +95,9 @@ describe(`operations.restore`, () => {
     });
 
     it(`correctly restore NodeSnapshot, no entity transformation on QueryRootId`, () => {
-      jestExpect(restoreGraphSnapshot.getNodeData(QueryRootId)).not.toBeInstanceOf(Three);
+      jestExpect(
+        restoreGraphSnapshot.getNodeData(QueryRootId)
+      ).not.toBeInstanceOf(Three);
     });
-
   });
 });

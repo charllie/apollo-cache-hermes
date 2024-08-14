@@ -1,11 +1,13 @@
 import { CacheContext } from '../../../../../src/context';
 import { GraphSnapshot } from '../../../../../src/GraphSnapshot';
 import { extract } from '../../../../../src/operations/extract';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 describe(`operations.extract`, () => {
   describe(`invalid values`, () => {
-
     let snapshot: GraphSnapshot, cacheContext: CacheContext;
     beforeAll(() => {
       cacheContext = createStrictCacheContext();
@@ -13,8 +15,8 @@ describe(`operations.extract`, () => {
         {
           nestedInvalid: {
             nan: NaN,
-            func: (() => {}) as any,
-          },
+            func: (() => {}) as any
+          }
         },
         `{ 
           nestedInvalid {
@@ -31,6 +33,5 @@ describe(`operations.extract`, () => {
         extract(snapshot, cacheContext);
       }).toThrow(/unserializable/i);
     });
-
   });
 });

@@ -2,16 +2,23 @@ import isEqual from '@wry/equality';
 
 import { CacheContext } from './context';
 import { ConflictingFieldsError } from './errors';
-import { DeepReadonly, JsonScalar, JsonObject, JsonValue, NestedObject, NestedValue } from './primitive';
+import {
+  DeepReadonly,
+  JsonObject,
+  JsonScalar,
+  JsonValue,
+  NestedObject,
+  NestedValue
+} from './primitive';
 import {
   ArgumentNode,
   FragmentMap,
   SelectionNode,
   SelectionSetNode,
   ValueNode,
-  isObject,
   fieldHasStaticDirective,
-  valueFromNode,
+  isObject,
+  valueFromNode
 } from './util';
 
 export type JsonAndVariables = JsonScalar | VariableArgument;
@@ -41,14 +48,15 @@ export class ParsedQueryNode<TArgTypes = JsonScalar> {
      * Whether a (transitive) child contains arguments.  This allows us to
      * ignore whole subtrees in some situations if they were completely static.
      * */
-    public hasParameterizedChildren?: true,
+    public hasParameterizedChildren?: true
   ) {}
 }
 
 /**
  * A ParsedQueryNode that is known to have arguments.
  */
-export interface ParsedQueryNodeWithArgs<TArgTypes = JsonScalar> extends ParsedQueryNode<TArgTypes> {
+export interface ParsedQueryNodeWithArgs<TArgTypes = JsonScalar>
+  extends ParsedQueryNode<TArgTypes> {
   args: NestedObject<TArgTypes>;
 }
 
@@ -63,7 +71,8 @@ export interface ParsedQueryNodeMap<TArgTypes> {
 /**
  * A parsed query is simply a map of top level fields and their descendants.
  */
-export interface ParsedQuery<TArgTypes = JsonScalar> extends ParsedQueryNodeMap<TArgTypes> {}
+export interface ParsedQuery<TArgTypes = JsonScalar>
+  extends ParsedQueryNodeMap<TArgTypes> {}
 
 /**
  * When we first parse a query, VariableArgument placeholders can exist in node
@@ -73,7 +82,8 @@ export interface ParsedQuery<TArgTypes = JsonScalar> extends ParsedQueryNodeMap<
  * substituted for any VariableArguments in the parsed query (and are a plain
  * ParsedQueryNode).
  */
-export interface ParsedQueryWithVariables extends ParsedQuery<JsonAndVariables> {}
+export interface ParsedQueryWithVariables
+  extends ParsedQuery<JsonAndVariables> {}
 
 /**
  * Represents the location a variable should be used as an argument to a
@@ -85,7 +95,7 @@ export interface ParsedQueryWithVariables extends ParsedQuery<JsonAndVariables> 
 export class VariableArgument {
   constructor(
     /** The name of the variable. */
-    public readonly name: string,
+    public readonly name: string
   ) {}
 }
 
@@ -95,12 +105,22 @@ export class VariableArgument {
 export function parseQuery(
   context: CacheContext,
   fragments: FragmentMap,
-  selectionSet: SelectionSetNode,
-): { parsedQuery: DeepReadonly<ParsedQueryWithVariables>, variables: Set<string> } {
+  selectionSet: SelectionSetNode
+): {
+  parsedQuery: DeepReadonly<ParsedQueryWithVariables>;
+  variables: Set<string>;
+} {
   const variables = new Set<string>();
-  const parsedQuery = _buildNodeMap(variables, context, fragments, selectionSet);
+  const parsedQuery = _buildNodeMap(
+    variables,
+    context,
+    fragments,
+    selectionSet
+  );
   if (!parsedQuery) {
-    throw new Error(`Parsed a query, but found no fields present; it may use unsupported GraphQL features`);
+    throw new Error(
+      `Parsed a query, but found no fields present; it may use unsupported GraphQL features`
+    );
   }
 
   return { parsedQuery, variables };
@@ -115,7 +135,7 @@ function _buildNodeMap(
   context: CacheContext,
   fragments: FragmentMap,
   selectionSet?: SelectionSetNode,
-  path: string[] = [],
+  path: string[] = []
 ): ParsedQueryWithVariables | undefined {
   if (!selectionSet) return undefined;
 
@@ -123,8 +143,16 @@ function _buildNodeMap(
   for (const selection of selectionSet.selections) {
     if (selection.kind === 'Field') {
       // The name of the field (as defined by the query).
-      const name = selection.alias ? selection.alias.value : selection.name.value;
-      const children = _buildNodeMap(variables, context, fragments, selection.selectionSet, [...path, name]);
+      const name = selection.alias
+        ? selection.alias.value
+        : selection.name.value;
+      const children = _buildNodeMap(
+        variables,
+        context,
+        fragments,
+        selection.selectionSet,
+        [...path, name]
+      );
 
       let args, schemaName;
       // fields marked as @static are treated as if they are a static field in
@@ -137,32 +165,58 @@ function _buildNodeMap(
 
       const hasParameterizedChildren = areChildrenDynamic(children);
 
-      const node = new ParsedQueryNode(children, schemaName, args, hasParameterizedChildren);
+      const node = new ParsedQueryNode(
+        children,
+        schemaName,
+        args,
+        hasParameterizedChildren
+      );
       nodeMap[name] = _mergeNodes([...path, name], node, nodeMap[name]);
-
     } else if (selection.kind === 'FragmentSpread') {
       const fragment = fragments[selection.name.value];
       if (!fragment) {
-        throw new Error(`Expected fragment ${selection.name.value} to be defined`);
+        throw new Error(
+          `Expected fragment ${selection.name.value} to be defined`
+        );
       }
 
-      const fragmentMap = _buildNodeMap(variables, context, fragments, fragment.selectionSet, path);
+      const fragmentMap = _buildNodeMap(
+        variables,
+        context,
+        fragments,
+        fragment.selectionSet,
+        path
+      );
       if (fragmentMap) {
         for (const name in fragmentMap) {
-          nodeMap[name] = _mergeNodes([...path, name], fragmentMap[name], nodeMap[name]);
+          nodeMap[name] = _mergeNodes(
+            [...path, name],
+            fragmentMap[name],
+            nodeMap[name]
+          );
         }
       }
-
     } else if (selection.kind === 'InlineFragment') {
-      const fragmentMap = _buildNodeMap(variables, context, fragments, selection.selectionSet, path);
+      const fragmentMap = _buildNodeMap(
+        variables,
+        context,
+        fragments,
+        selection.selectionSet,
+        path
+      );
       if (fragmentMap) {
         for (const name in fragmentMap) {
-          nodeMap[name] = _mergeNodes([...path, name], fragmentMap[name], nodeMap[name]);
+          nodeMap[name] = _mergeNodes(
+            [...path, name],
+            fragmentMap[name],
+            nodeMap[name]
+          );
         }
       }
-
     } else if (context.tracer.warning) {
-      context.tracer.warning(`${(selection as any).kind} selections are not supported; query may misbehave`);
+      context.tracer.warning(
+        `${(selection as any).kind} selections are not supported; query may misbehave`
+      );
     }
 
     _collectDirectiveVariables(variables, selection);
@@ -188,10 +242,13 @@ export function areChildrenDynamic(children?: ParsedQueryWithVariables) {
 /**
  * Build the map of arguments to their natural JS values (or variables).
  */
-function _buildFieldArgs(variables: Set<string>, argumentsNode?: readonly ArgumentNode[]) {
+function _buildFieldArgs(
+  variables: Set<string>,
+  argumentsNode?: readonly ArgumentNode[]
+) {
   if (!argumentsNode) return undefined;
 
-  const args = {};
+  const args: Record<string, JsonValue> = {};
   for (const arg of argumentsNode) {
     // Mapped name of argument to it JS value
     args[arg.name.value] = _valueFromNode(variables, arg.value);
@@ -213,7 +270,10 @@ function _valueFromNode(variables: Set<string>, node: ValueNode): JsonValue {
 /**
  * Collect the variables in use by any directives on the node.
  */
-function _collectDirectiveVariables(variables: Set<string>, node: SelectionNode) {
+function _collectDirectiveVariables(
+  variables: Set<string>,
+  node: SelectionNode
+) {
   const { directives } = node;
   if (!directives) return;
 
@@ -232,10 +292,17 @@ function _collectDirectiveVariables(variables: Set<string>, node: SelectionNode)
  * Merges two node definitions; mutating `target` to include children from
  * `source`.
  */
-function _mergeNodes<TArgTypes>(path: string[], target: ParsedQueryNode<TArgTypes>, source?: ParsedQueryNode<TArgTypes>) {
+function _mergeNodes<TArgTypes>(
+  path: string[],
+  target: ParsedQueryNode<TArgTypes>,
+  source?: ParsedQueryNode<TArgTypes>
+) {
   if (!source) return target;
   if (!isEqual(target.args, source.args)) {
-    throw new ConflictingFieldsError(`parameterization mismatch`, path, [target, source]);
+    throw new ConflictingFieldsError(`parameterization mismatch`, path, [
+      target,
+      source
+    ]);
   }
   if (target.schemaName !== source.schemaName) {
     throw new ConflictingFieldsError(`alias mismatch`, path, [target, source]);
@@ -246,7 +313,11 @@ function _mergeNodes<TArgTypes>(path: string[], target: ParsedQueryNode<TArgType
     target.children = source.children;
   } else {
     for (const name in source.children) {
-      target.children[name] = _mergeNodes([...path, name], source.children[name], target.children[name]);
+      target.children[name] = _mergeNodes(
+        [...path, name],
+        source.children[name],
+        target.children[name]
+      );
     }
   }
 
@@ -263,14 +334,20 @@ function _mergeNodes<TArgTypes>(path: string[], target: ParsedQueryNode<TArgType
  *
  * This requires that all variables used are provided in `variables`.
  */
-export function expandVariables(parsed: ParsedQueryWithVariables, variables: JsonObject | undefined): ParsedQuery {
+export function expandVariables(
+  parsed: ParsedQueryWithVariables,
+  variables: JsonObject | undefined
+): ParsedQuery {
   return _expandVariables(parsed, variables)!;
 }
 
-export function _expandVariables(parsed?: ParsedQueryWithVariables, variables?: JsonObject) {
+export function _expandVariables(
+  parsed?: ParsedQueryWithVariables,
+  variables?: JsonObject
+) {
   if (!parsed) return undefined;
 
-  const newMap = {};
+  const newMap: Record<string, ParsedQueryNode<any>> = {};
   for (const key in parsed) {
     const node = parsed[key];
     if (node.args || node.hasParameterizedChildren) {
@@ -278,9 +355,9 @@ export function _expandVariables(parsed?: ParsedQueryWithVariables, variables?: 
         _expandVariables(node.children, variables),
         node.schemaName,
         expandFieldArguments(node.args, variables),
-        node.hasParameterizedChildren,
+        node.hasParameterizedChildren
       );
-    // No variables to substitute for this subtree.
+      // No variables to substitute for this subtree.
     } else {
       newMap[key] = node;
     }
@@ -294,14 +371,14 @@ export function _expandVariables(parsed?: ParsedQueryWithVariables, variables?: 
  */
 export function expandFieldArguments(
   args: NestedValue<JsonAndVariables> | undefined,
-  variables: JsonObject | undefined,
+  variables: JsonObject | undefined
 ): JsonObject | undefined {
-  return args ? _expandArgument(args, variables) as JsonObject : undefined;
+  return args ? (_expandArgument(args, variables) as JsonObject) : undefined;
 }
 
 export function _expandArgument(
   arg: NestedValue<JsonAndVariables>,
-  variables: JsonObject | undefined,
+  variables: JsonObject | undefined
 ): JsonValue {
   if (arg instanceof VariableArgument) {
     if (!variables || !(arg.name in variables)) {

@@ -2,13 +2,12 @@ import gql from 'graphql-tag';
 
 import { Hermes } from '../../../../src/apollo/Hermes';
 import { CacheContext } from '../../../../src/context/CacheContext';
-import { StaticNodeId, Serializable } from '../../../../src/schema';
+import { Serializable, StaticNodeId } from '../../../../src/schema';
 import { strictConfig } from '../../../helpers/context';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`writeFragment with multiple fragments`, () => {
-
   let hermes: Hermes;
   const fragments = gql(`
     fragment viewer on Viewer {
@@ -31,8 +30,8 @@ describe(`writeFragment with multiple fragments`, () => {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         outbound: [{ id: '123', path: ['viewer'] }],
         data: {
-          justValue: '42',
-        },
+          justValue: '42'
+        }
       },
       '123': {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
@@ -41,17 +40,17 @@ describe(`writeFragment with multiple fragments`, () => {
         data: {
           id: 123,
           nameViewer: 'Gouda',
-          __typename: 'Viewer',
-        },
+          __typename: 'Viewer'
+        }
       },
-      'shipment0': {
+      shipment0: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         inbound: [{ id: '123', path: ['shipment'] }],
         data: {
           id: 'shipment0',
-          __typename: 'Shipment',
-        },
-      },
+          __typename: 'Shipment'
+        }
+      }
     });
   });
 
@@ -62,18 +61,20 @@ describe(`writeFragment with multiple fragments`, () => {
       fragment: fragments,
       data: {
         id: 123,
-        nameViewer: 'Munster',
-      },
+        nameViewer: 'Munster'
+      }
     });
 
-    expect(hermes.getCurrentCacheSnapshot().baseline.getNodeData('123')).to.deep.eq({
+    expect(
+      hermes.getCurrentCacheSnapshot().baseline.getNodeData('123')
+    ).to.deep.eq({
       id: 123,
       nameViewer: 'Munster',
       __typename: 'Viewer',
       shipment: {
         id: 'shipment0',
-        __typename: 'Shipment',
-      },
+        __typename: 'Shipment'
+      }
     });
   });
 
@@ -86,21 +87,25 @@ describe(`writeFragment with multiple fragments`, () => {
         id: 'shipment0',
         name: 'Shipping some Cheese',
         begin: 'Seattle',
-        end: 'West Seattle',
-      },
+        end: 'West Seattle'
+      }
     });
 
-    expect(hermes.getCurrentCacheSnapshot().baseline.getNodeData('shipment0')).to.deep.eq({
+    expect(
+      hermes.getCurrentCacheSnapshot().baseline.getNodeData('shipment0')
+    ).to.deep.eq({
       id: 'shipment0',
       name: 'Shipping some Cheese',
       begin: 'Seattle',
       end: 'West Seattle',
-      __typename: 'Shipment',
+      __typename: 'Shipment'
     });
   });
 
   it(`correctly modify 'viewer' reference`, () => {
-    expect(hermes.getCurrentCacheSnapshot().baseline.getNodeData('123')).to.deep.eq({
+    expect(
+      hermes.getCurrentCacheSnapshot().baseline.getNodeData('123')
+    ).to.deep.eq({
       id: 123,
       nameViewer: 'Munster',
       __typename: 'Viewer',
@@ -109,9 +114,8 @@ describe(`writeFragment with multiple fragments`, () => {
         name: 'Shipping some Cheese',
         begin: 'Seattle',
         end: 'West Seattle',
-        __typename: 'Shipment',
-      },
+        __typename: 'Shipment'
+      }
     });
   });
-
 });

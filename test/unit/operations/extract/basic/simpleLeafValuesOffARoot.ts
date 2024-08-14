@@ -1,12 +1,14 @@
 import { extract } from '../../../../../src/operations/extract';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`simple leaf-values hanging off a root`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
@@ -23,10 +25,9 @@ describe(`operations.extract`, () => {
       jestExpect(extractResult).toEqual({
         [QueryRootId]: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
-          data: { foo: 123, bar: 'asdf' },
-        },
+          data: { foo: 123, bar: 'asdf' }
+        }
       });
     });
-
   });
 });

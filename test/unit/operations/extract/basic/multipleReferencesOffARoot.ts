@@ -1,12 +1,14 @@
 import { extract } from '../../../../../src/operations/extract';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`multiple references hanging off a root`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
@@ -14,12 +16,12 @@ describe(`operations.extract`, () => {
         {
           bar: {
             id: 123,
-            name: 'Gouda',
+            name: 'Gouda'
           },
           foo: {
             id: 456,
-            name: 'Brie',
-          },
+            name: 'Brie'
+          }
         },
         `{
           bar { id name }
@@ -37,25 +39,24 @@ describe(`operations.extract`, () => {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           outbound: [
             { id: '123', path: ['bar'] },
-            { id: '456', path: ['foo'] },
+            { id: '456', path: ['foo'] }
           ],
           data: {
             bar: undefined,
-            foo: undefined,
-          },
+            foo: undefined
+          }
         },
         '123': {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: QueryRootId, path: ['bar'] }],
-          data: { id: 123, name: 'Gouda' },
+          data: { id: 123, name: 'Gouda' }
         },
         '456': {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: QueryRootId, path: ['foo'] }],
-          data: { id: 456, name: 'Brie' },
-        },
+          data: { id: 456, name: 'Brie' }
+        }
       });
     });
-
   });
 });

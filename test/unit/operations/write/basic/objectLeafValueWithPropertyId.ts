@@ -10,15 +10,14 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
   describe(`object leaf-value with property id`, () => {
-
     let snapshot: GraphSnapshot, editedNodeIds: Set<NodeId>;
     beforeAll(() => {
       const result = createSnapshot(
         {
           foo: { id: 1 },
           bar: {
-            baz: { id: 1 },
-          },
+            baz: { id: 1 }
+          }
         },
         `{ foo bar }`
       );
@@ -31,18 +30,21 @@ describe(`operations.write`, () => {
       jestExpect(snapshot.getNodeData(QueryRootId)).toEqual({
         foo: { id: 1 },
         bar: {
-          baz: { id: 1 },
-        },
+          baz: { id: 1 }
+        }
       });
     });
 
     it(`does not normalize the values of the object leaf-value`, () => {
-      jestExpect(snapshot.allNodeIds()).toEqual(jestExpect.arrayContaining([QueryRootId]));
+      jestExpect(snapshot.allNodeIds()).toEqual(
+        jestExpect.arrayContaining([QueryRootId])
+      );
     });
 
     it(`marks the container as edited`, () => {
-      jestExpect(Array.from(editedNodeIds)).toEqual(jestExpect.arrayContaining([QueryRootId]));
+      jestExpect(Array.from(editedNodeIds)).toEqual(
+        jestExpect.arrayContaining([QueryRootId])
+      );
     });
-
   });
 });

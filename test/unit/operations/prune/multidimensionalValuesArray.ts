@@ -1,6 +1,10 @@
 import { extract, prune } from '../../../../src/operations';
 import { Serializable, StaticNodeId } from '../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext, query } from '../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext,
+  query
+} from '../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
@@ -13,13 +17,13 @@ describe(`operations.prune`, () => {
         rows: [
           [
             { value: 1, extra: 'wind' },
-            { value: 2, extra: 'air' },
+            { value: 2, extra: 'air' }
           ],
           [
             { value: 3, extra: 'fire' },
-            { value: 4, extra: 'earth' },
-          ],
-        ],
+            { value: 4, extra: 'earth' }
+          ]
+        ]
       },
       `{ 
         rows {
@@ -41,18 +45,11 @@ describe(`operations.prune`, () => {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         data: {
           rows: [
-            [
-              { value: 1 },
-              { value: 2 },
-            ],
-            [
-              { value: 3 },
-              { value: 4 },
-            ],
-          ],
-        },
-      },
+            [{ value: 1 }, { value: 2 }],
+            [{ value: 3 }, { value: 4 }]
+          ]
+        }
+      }
     });
   });
-
 });

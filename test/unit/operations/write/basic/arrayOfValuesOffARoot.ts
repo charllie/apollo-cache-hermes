@@ -11,7 +11,6 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
   describe(`array of values hanging off of a root`, () => {
-
     let snapshot: GraphSnapshot, editedNodeIds: Set<NodeId>;
     beforeAll(() => {
       const result = createSnapshot(
@@ -19,13 +18,13 @@ describe(`operations.write`, () => {
           viewer: [
             {
               postal: 123,
-              name: 'Gouda',
+              name: 'Gouda'
             },
             {
               postal: 456,
-              name: 'Brie',
-            },
-          ],
+              name: 'Brie'
+            }
+          ]
         },
         `{ viewer { postal name } }`
       );
@@ -38,25 +37,27 @@ describe(`operations.write`, () => {
         viewer: [
           {
             postal: 123,
-            name: 'Gouda',
+            name: 'Gouda'
           },
           {
             postal: 456,
-            name: 'Brie',
-          },
-        ],
+            name: 'Brie'
+          }
+        ]
       });
     });
 
     it(`emits the root as an EntitySnapshot`, () => {
-      jestExpect(snapshot.getNodeSnapshot(QueryRootId)).toBeInstanceOf(EntitySnapshot);
+      jestExpect(snapshot.getNodeSnapshot(QueryRootId)).toBeInstanceOf(
+        EntitySnapshot
+      );
     });
 
     it(`directly references a first entity of viewer from the query root`, () => {
       const queryRoot = snapshot.getNodeData(QueryRootId);
       jestExpect(queryRoot.viewer[0]).toEqual({
         postal: 123,
-        name: 'Gouda',
+        name: 'Gouda'
       });
     });
 
@@ -67,12 +68,15 @@ describe(`operations.write`, () => {
     });
 
     it(`marks a query root as edited`, () => {
-      jestExpect(Array.from(editedNodeIds)).toEqual(jestExpect.arrayContaining([QueryRootId]));
+      jestExpect(Array.from(editedNodeIds)).toEqual(
+        jestExpect.arrayContaining([QueryRootId])
+      );
     });
 
     it(`only contains a one node`, () => {
-      jestExpect(snapshot.allNodeIds()).toEqual(jestExpect.arrayContaining([QueryRootId]));
+      jestExpect(snapshot.allNodeIds()).toEqual(
+        jestExpect.arrayContaining([QueryRootId])
+      );
     });
   });
-
 });

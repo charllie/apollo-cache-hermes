@@ -38,12 +38,12 @@ describe(`overlapping fragments`, () => {
         myDetailedBar: {
           id: 'Bar:1',
           fizz: 'buzz',
-          payload: 'huge',
+          payload: 'huge'
         },
         myFooOrBar: {
           id: 'Bar:1',
-          fizz: 'buzz',
-        },
+          fizz: 'buzz'
+        }
       },
       cyclicRefQuery
     );

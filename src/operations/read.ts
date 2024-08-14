@@ -2,8 +2,13 @@ import { CacheContext } from '../context';
 import { GraphSnapshot } from '../GraphSnapshot';
 import { ParsedQuery, ParsedQueryNode } from '../ParsedQueryNode';
 import { JsonObject, JsonValue, PathPart } from '../primitive';
-import { NodeId, OperationInstance, RawOperation, StaticNodeId } from '../schema';
-import { isNil, isObject, walkOperation, deepGet } from '../util';
+import {
+  NodeId,
+  OperationInstance,
+  RawOperation,
+  StaticNodeId
+} from '../schema';
+import { deepGet, isNil, isObject, walkOperation } from '../util';
 
 import { nodeIdForParameterizedValue } from './SnapshotEditor';
 
@@ -26,9 +31,24 @@ export interface QueryResultWithNodeIds extends QueryResult {
 /**
  * Get you some data.
  */
-export function read(context: CacheContext, raw: RawOperation, snapshot: GraphSnapshot, includeNodeIds: true): QueryResultWithNodeIds;
-export function read(context: CacheContext, raw: RawOperation, snapshot: GraphSnapshot, includeNodeIds?: boolean): QueryResult;
-export function read(context: CacheContext, raw: RawOperation, snapshot: GraphSnapshot, includeNodeIds?: boolean) {
+export function read(
+  context: CacheContext,
+  raw: RawOperation,
+  snapshot: GraphSnapshot,
+  includeNodeIds: true
+): QueryResultWithNodeIds;
+export function read(
+  context: CacheContext,
+  raw: RawOperation,
+  snapshot: GraphSnapshot,
+  includeNodeIds?: boolean
+): QueryResult;
+export function read(
+  context: CacheContext,
+  raw: RawOperation,
+  snapshot: GraphSnapshot,
+  includeNodeIds?: boolean
+) {
   let tracerContext;
   if (context.tracer.readStart) {
     tracerContext = context.tracer.readStart(raw);
@@ -37,7 +57,9 @@ export function read(context: CacheContext, raw: RawOperation, snapshot: GraphSn
   const operation = context.parseOperation(raw);
 
   // Retrieve the previous result (may be partially complete), or start anew.
-  const queryResult = snapshot.readCache.get(operation) || {} as Partial<QueryResultWithNodeIds>;
+  const queryResult =
+    snapshot.readCache.get(operation) ||
+    ({} as Partial<QueryResultWithNodeIds>);
   snapshot.readCache.set(operation, queryResult as QueryResult);
 
   let cacheHit = true;
@@ -47,7 +69,13 @@ export function read(context: CacheContext, raw: RawOperation, snapshot: GraphSn
 
     if (!operation.isStatic) {
       const dynamicNodeIds = new Set<NodeId>();
-      queryResult.result = _walkAndOverlayDynamicValues(operation, context, snapshot, queryResult.result, dynamicNodeIds!);
+      queryResult.result = _walkAndOverlayDynamicValues(
+        operation,
+        context,
+        snapshot,
+        queryResult.result,
+        dynamicNodeIds!
+      );
       queryResult.dynamicNodeIds = dynamicNodeIds;
     }
 
@@ -56,7 +84,12 @@ export function read(context: CacheContext, raw: RawOperation, snapshot: GraphSn
     // When strict mode is disabled, we carry completeness forward for observed
     // queries.  Once complete, always complete.
     if (typeof queryResult.complete !== 'boolean') {
-      queryResult.complete = _visitSelection(operation, context, queryResult.result, queryResult.entityIds);
+      queryResult.complete = _visitSelection(
+        operation,
+        context,
+        queryResult.result,
+        queryResult.entityIds
+      );
     }
   }
 
@@ -66,7 +99,12 @@ export function read(context: CacheContext, raw: RawOperation, snapshot: GraphSn
   if (includeNodeIds && !queryResult.entityIds) {
     cacheHit = false;
     const entityIds = new Set<NodeId>();
-    const complete = _visitSelection(operation, context, queryResult.result, entityIds);
+    const complete = _visitSelection(
+      operation,
+      context,
+      queryResult.result,
+      entityIds
+    );
     queryResult.complete = complete;
     queryResult.entityIds = entityIds;
   }
@@ -84,7 +122,7 @@ class OverlayWalkNode {
     public readonly value: JsonObject,
     public readonly containerId: NodeId,
     public readonly parsedMap: ParsedQuery,
-    public readonly path: PathPart[],
+    public readonly path: PathPart[]
   ) {}
 }
 
@@ -101,7 +139,7 @@ export function _walkAndOverlayDynamicValues(
   context: CacheContext,
   snapshot: GraphSnapshot,
   result: JsonObject | undefined,
-  dynamicNodeIds: Set<NodeId>,
+  dynamicNodeIds: Set<NodeId>
 ): JsonObject | undefined {
   // Corner case: We stop walking once we reach a parameterized field with no
   // snapshot, but we should also preemptively stop walking if there are no
@@ -117,7 +155,9 @@ export function _walkAndOverlayDynamicValues(
   // TODO: This logic sucks.  We'd do much better if we had knowledge of the
   // schema.  Can we layer that on in such a way that we can support uses w/ and
   // w/o a schema compilation step?
-  const queue = [new OverlayWalkNode(newResult, query.rootId, query.parsedQuery, [])];
+  const queue = [
+    new OverlayWalkNode(newResult, query.rootId, query.parsedQuery, [])
+  ];
 
   while (queue.length) {
     const walkNode = queue.pop()!;
@@ -141,7 +181,11 @@ export function _walkAndOverlayDynamicValues(
       let nextPath = path;
 
       if (node.args) {
-        let childId = nodeIdForParameterizedValue(containerId, [...path, fieldName], node.args);
+        let childId = nodeIdForParameterizedValue(
+          containerId,
+          [...path, fieldName],
+          node.args
+        );
         let childSnapshot = snapshot.getNodeSnapshot(childId);
         if (!childSnapshot) {
           let typeName = value.__typename as string;
@@ -150,7 +194,10 @@ export function _walkAndOverlayDynamicValues(
           }
 
           // Should we fall back to a redirect?
-          const redirect: CacheContext.ResolverRedirect | undefined = deepGet(context.resolverRedirects, [typeName, fieldName]) as any;
+          const redirect: CacheContext.ResolverRedirect | undefined = deepGet(
+            context.resolverRedirects,
+            [typeName, fieldName]
+          ) as any;
           if (redirect) {
             childId = redirect(node.args);
             if (!isNil(childId)) {
@@ -178,7 +225,14 @@ export function _walkAndOverlayDynamicValues(
 
         for (let i = 0; i < allChildValues.length; i++) {
           const item = allChildValues[i];
-          queue.push(new OverlayWalkNode(item.value, nextContainerId, node.children ?? {}, item.path));
+          queue.push(
+            new OverlayWalkNode(
+              item.value,
+              nextContainerId,
+              node.children ?? {},
+              item.path
+            )
+          );
         }
       }
 
@@ -218,14 +272,17 @@ function _shouldWalkChildren(
  *  Private: Represents and location and value of objects discovered while
  *  flattening the value of a graphql object field.
  */
-type FlattenedGraphQLObject = { value: JsonObject, path: PathPart[] };
+type FlattenedGraphQLObject = { value: JsonObject; path: PathPart[] };
 
 /**
  *  Finds all of the actual objects in `value` which can be a single object, an
  *  array of objects, or a multidimensional array of objects, and returns them
  *  as a flat list.
  */
-function _flattenGraphQLObject(value: UnknownGraphQLObject, path: PathPart[]): FlattenedGraphQLObject[] {
+function _flattenGraphQLObject(
+  value: UnknownGraphQLObject,
+  path: PathPart[]
+): FlattenedGraphQLObject[] {
   if (value === null) return [];
   if (!Array.isArray(value)) return [{ value, path }];
 
@@ -241,7 +298,10 @@ function _flattenGraphQLObject(value: UnknownGraphQLObject, path: PathPart[]): F
   return flattened;
 }
 
-function _recursivelyWrapValue<T extends JsonValue>(value: T | undefined, context: CacheContext): T {
+function _recursivelyWrapValue<T extends JsonValue>(
+  value: T | undefined,
+  context: CacheContext
+): T {
   if (!Array.isArray(value)) {
     return _wrapValue(value, context);
   }
@@ -256,7 +316,10 @@ function _recursivelyWrapValue<T extends JsonValue>(value: T | undefined, contex
   return newValue as T;
 }
 
-function _wrapValue<T extends JsonValue>(value: T | undefined, context: CacheContext): T {
+function _wrapValue<T extends JsonValue>(
+  value: T | undefined,
+  context: CacheContext
+): T {
   if (value === undefined) {
     return {} as T;
   }
@@ -281,7 +344,7 @@ export function _visitSelection(
   query: OperationInstance,
   context: CacheContext,
   result?: JsonObject,
-  nodeIds?: Set<NodeId>,
+  nodeIds?: Set<NodeId>
 ): boolean {
   let complete = true;
   if (nodeIds && result !== undefined) {

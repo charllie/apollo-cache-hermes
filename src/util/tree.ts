@@ -4,21 +4,27 @@ import { JsonObject, JsonValue, PathPart } from '../primitive';
 class OperationWalkNode {
   constructor(
     public readonly parsedOperation: ParsedQueryWithVariables,
-    public readonly parent?: JsonValue,
+    public readonly parent?: JsonValue
   ) {}
 }
 
 /**
  * Returning true indicates that the walk should STOP.
  */
-export type OperationVisitor = (parent: JsonValue | undefined, fields: string[]) => boolean;
+export type OperationVisitor = (
+  parent: JsonValue | undefined,
+  fields: string[]
+) => boolean;
 
 /**
  * Walk and run on ParsedQueryNode and the result.
  * This is used to verify result of the read operation.
  */
-export function walkOperation(rootOperation: ParsedQueryWithVariables, result: JsonObject | undefined, visitor: OperationVisitor) {
-
+export function walkOperation(
+  rootOperation: ParsedQueryWithVariables,
+  result: JsonObject | undefined,
+  visitor: OperationVisitor
+) {
   // Perform the walk as a depth-first traversal; and unlike the payload walk,
   // we don't bother tracking the path.
   const stack = [new OperationWalkNode(rootOperation, result)];
@@ -43,7 +49,9 @@ export function walkOperation(rootOperation: ParsedQueryWithVariables, result: J
       fields.push(fieldName);
       const nextParsedQuery = parsedOperation[fieldName].children;
       if (nextParsedQuery) {
-        stack.push(new OperationWalkNode(nextParsedQuery, get(parent, fieldName)));
+        stack.push(
+          new OperationWalkNode(nextParsedQuery, get(parent, fieldName))
+        );
       }
     }
 

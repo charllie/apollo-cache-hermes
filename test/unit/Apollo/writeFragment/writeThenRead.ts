@@ -2,13 +2,12 @@ import gql from 'graphql-tag';
 
 import { Hermes } from '../../../../src/apollo/Hermes';
 import { CacheContext } from '../../../../src/context/CacheContext';
-import { StaticNodeId, Serializable } from '../../../../src/schema';
+import { Serializable, StaticNodeId } from '../../../../src/schema';
 import { strictConfig } from '../../../helpers/context';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`writeFragment and then readFragment`, () => {
-
   let hermes: Hermes;
   const readWriteFragment = gql(`
     fragment viewer on Viewer {
@@ -35,8 +34,8 @@ describe(`writeFragment and then readFragment`, () => {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         outbound: [{ id: '123', path: ['viewer'] }],
         data: {
-          justValue: '42',
-        },
+          justValue: '42'
+        }
       },
       '123': {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
@@ -45,10 +44,10 @@ describe(`writeFragment and then readFragment`, () => {
         data: {
           id: 123,
           name: 'Gouda',
-          __typename: 'Viewer',
-        },
+          __typename: 'Viewer'
+        }
       },
-      'shipment0': {
+      shipment0: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         inbound: [{ id: '123', path: ['shipment'] }],
         data: {
@@ -56,9 +55,9 @@ describe(`writeFragment and then readFragment`, () => {
           complete: false,
           city: 'Seattle',
           distance: 100,
-          __typename: 'Shipment',
-        },
-      },
+          __typename: 'Shipment'
+        }
+      }
     });
   });
 
@@ -69,18 +68,20 @@ describe(`writeFragment and then readFragment`, () => {
       fragment: readWriteFragment,
       data: {
         id: 123,
-        name: 'Munster',
-      },
+        name: 'Munster'
+      }
     });
 
-    expect(hermes.readFragment({
-      id: '123',
-      fragmentName: 'viewer',
-      fragment: readWriteFragment,
-    })).to.include({
+    expect(
+      hermes.readFragment({
+        id: '123',
+        fragmentName: 'viewer',
+        fragment: readWriteFragment
+      })
+    ).to.include({
       id: 123,
       name: 'Munster',
-      __typename: 'Viewer',
+      __typename: 'Viewer'
     });
   });
 
@@ -92,15 +93,17 @@ describe(`writeFragment and then readFragment`, () => {
       data: {
         id: 'shipment0',
         complete: true,
-        date: '11/11/17',
-      },
+        date: '11/11/17'
+      }
     });
 
-    expect(hermes.readFragment({
-      id: '123',
-      fragmentName: 'viewerPlusShipment',
-      fragment: readWriteFragment,
-    })).to.deep.eq({
+    expect(
+      hermes.readFragment({
+        id: '123',
+        fragmentName: 'viewerPlusShipment',
+        fragment: readWriteFragment
+      })
+    ).to.deep.eq({
       id: 123,
       name: 'Gouda',
       __typename: 'Viewer',
@@ -110,9 +113,8 @@ describe(`writeFragment and then readFragment`, () => {
         date: '11/11/17',
         city: 'Seattle',
         distance: 100,
-        __typename: 'Shipment',
-      },
+        __typename: 'Shipment'
+      }
     });
   });
-
 });

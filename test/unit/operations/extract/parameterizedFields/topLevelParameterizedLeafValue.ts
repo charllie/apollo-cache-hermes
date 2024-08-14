@@ -1,19 +1,21 @@
 import { extract } from '../../../../../src/operations/extract';
 import { nodeIdForParameterizedValue } from '../../../../../src/operations/SnapshotEditor';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`top-level parameterized leaf value`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
       const snapshot = createGraphSnapshot(
         {
-          foo: null,
+          foo: null
         },
         `query getAFoo($id: ID!) {
           foo(id: $id, withExtra: true) 
@@ -35,15 +37,14 @@ describe(`operations.extract`, () => {
       jestExpect(extractResult).toEqual({
         [QueryRootId]: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
-          outbound: [{ id: parameterizedId, path: ['foo'] }],
+          outbound: [{ id: parameterizedId, path: ['foo'] }]
         },
         [parameterizedId]: {
           type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
           inbound: [{ id: QueryRootId, path: ['foo'] }],
-          data: null,
-        },
+          data: null
+        }
       });
     });
-
   });
 });

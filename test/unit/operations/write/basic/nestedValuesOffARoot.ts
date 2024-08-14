@@ -11,7 +11,6 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
   describe(`nested values hanging off of a root`, () => {
-
     let snapshot: GraphSnapshot, editedNodeIds: Set<NodeId>;
     beforeAll(() => {
       const result = createSnapshot(
@@ -21,9 +20,9 @@ describe(`operations.write`, () => {
             prop1: 'hello',
             prop2: {
               nestedProp1: 1000,
-              nestedProp2: 'world',
-            },
-          },
+              nestedProp2: 'world'
+            }
+          }
         },
         `{
           bar {
@@ -45,23 +44,28 @@ describe(`operations.write`, () => {
           prop1: 'hello',
           prop2: {
             nestedProp1: 1000,
-            nestedProp2: 'world',
-          },
-        },
+            nestedProp2: 'world'
+          }
+        }
       });
     });
 
     it(`marks the root as edited`, () => {
-      jestExpect(Array.from(editedNodeIds)).toEqual(jestExpect.arrayContaining([QueryRootId]));
+      jestExpect(Array.from(editedNodeIds)).toEqual(
+        jestExpect.arrayContaining([QueryRootId])
+      );
     });
 
     it(`only contains the root node`, () => {
-      jestExpect(snapshot.allNodeIds()).toEqual(jestExpect.arrayContaining([QueryRootId]));
+      jestExpect(snapshot.allNodeIds()).toEqual(
+        jestExpect.arrayContaining([QueryRootId])
+      );
     });
 
     it(`emits the root as an EntitySnapshot`, () => {
-      jestExpect(snapshot.getNodeSnapshot(QueryRootId)).toBeInstanceOf(EntitySnapshot);
+      jestExpect(snapshot.getNodeSnapshot(QueryRootId)).toBeInstanceOf(
+        EntitySnapshot
+      );
     });
   });
-
 });

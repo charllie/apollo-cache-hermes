@@ -1,12 +1,16 @@
-import lodashSet = require('lodash.set');
-import lodashFindIndex = require('lodash.findindex');
-
+import * as _ from 'lodash';
 import { CacheSnapshot } from '../CacheSnapshot';
 import { CacheContext } from '../context';
 import { GraphSnapshot, NodeSnapshotMap } from '../GraphSnapshot';
 import { EntitySnapshot, ParameterizedValueSnapshot } from '../nodes';
 import { OptimisticUpdateQueue } from '../OptimisticUpdateQueue';
-import { JsonObject, JsonValue, NestedValue, PathPart } from '../primitive';
+import {
+  JsonObject,
+  JsonValue,
+  NestedObject,
+  NestedValue,
+  PathPart
+} from '../primitive';
 import { NodeId, Serializable } from '../schema';
 import { isNumber, isObject, isScalar, referenceValues } from '../util';
 
@@ -21,17 +25,30 @@ import { isNumber, isObject, isScalar, referenceValues } from '../util';
  *    different sub-class of NodeSnapshot.
  * @throws Will throw an error if there is undefined in sparse array
  */
-export function restore(serializedState: Serializable.GraphSnapshot, cacheContext: CacheContext) {
-  const { nodesMap, editedNodeIds } = createGraphSnapshotNodes(serializedState, cacheContext);
+export function restore(
+  serializedState: Serializable.GraphSnapshot,
+  cacheContext: CacheContext
+) {
+  const { nodesMap, editedNodeIds } = createGraphSnapshotNodes(
+    serializedState,
+    cacheContext
+  );
   const graphSnapshot = new GraphSnapshot(nodesMap);
 
   return {
-    cacheSnapshot: new CacheSnapshot(graphSnapshot, graphSnapshot, new OptimisticUpdateQueue()),
-    editedNodeIds,
+    cacheSnapshot: new CacheSnapshot(
+      graphSnapshot,
+      graphSnapshot,
+      new OptimisticUpdateQueue()
+    ),
+    editedNodeIds
   };
 }
 
-function createGraphSnapshotNodes(serializedState: Serializable.GraphSnapshot, cacheContext: CacheContext) {
+function createGraphSnapshotNodes(
+  serializedState: Serializable.GraphSnapshot,
+  cacheContext: CacheContext
+) {
   const nodesMap: NodeSnapshotMap = Object.create(null);
   const editedNodeIds = new Set<NodeId>();
 
@@ -42,13 +59,23 @@ function createGraphSnapshotNodes(serializedState: Serializable.GraphSnapshot, c
     let nodeSnapshot;
     switch (type) {
       case Serializable.NodeSnapshotType.EntitySnapshot:
-        nodeSnapshot = new EntitySnapshot(data as JsonObject, inbound, outbound);
+        nodeSnapshot = new EntitySnapshot(
+          data as JsonObject,
+          inbound,
+          outbound
+        );
         break;
       case Serializable.NodeSnapshotType.ParameterizedValueSnapshot:
-        nodeSnapshot = new ParameterizedValueSnapshot(data as JsonValue, inbound, outbound);
+        nodeSnapshot = new ParameterizedValueSnapshot(
+          data as JsonValue,
+          inbound,
+          outbound
+        );
         break;
       default:
-        throw new Error(`Invalid Serializable.NodeSnapshotType ${type} at ${nodeId}`);
+        throw new Error(
+          `Invalid Serializable.NodeSnapshotType ${type} at ${nodeId}`
+        );
     }
 
     nodesMap[nodeId] = nodeSnapshot!;
@@ -61,7 +88,10 @@ function createGraphSnapshotNodes(serializedState: Serializable.GraphSnapshot, c
   return { nodesMap, editedNodeIds };
 }
 
-function restoreEntityReferences(nodesMap: NodeSnapshotMap, cacheContext: CacheContext) {
+function restoreEntityReferences(
+  nodesMap: NodeSnapshotMap,
+  cacheContext: CacheContext
+) {
   const { entityTransformer, entityIdForValue } = cacheContext;
 
   for (const nodeId in nodesMap) {
@@ -88,12 +118,12 @@ function restoreEntityReferences(nodesMap: NodeSnapshotMap, cacheContext: CacheC
         // ParameterizedValueSnapshot.
         // (see: parameterizedFields/nestedParameterizedReferenceInArray.ts)
         // We only want to try walking if its data contains an array
-        const indexToArrayIndex = lodashFindIndex(path, isNumber);
+        const indexToArrayIndex = _.findIndex(path, isNumber);
         if (indexToArrayIndex !== -1) {
           tryRestoreSparseArray(data, path, 0);
         }
       } else if (Array.isArray(data) || isObject(data)) {
-        lodashSet(data, path, referenceNode.data);
+        _.set(data, path, referenceNode.data);
       }
     }
   }
@@ -117,13 +147,23 @@ function restoreEntityReferences(nodesMap: NodeSnapshotMap, cacheContext: CacheC
  * JSON.stringify to 'null' and will preserve the structure along the path
  *
  */
-function tryRestoreSparseArray(data: NestedValue<JsonValue | undefined>, possibleSparseArrayPaths: PathPart[], idx: number) {
+function tryRestoreSparseArray(
+  data: NestedValue<JsonValue | undefined>,
+  possibleSparseArrayPaths: PathPart[],
+  idx: number
+) {
   if (data === undefined) {
     // There should never be 'undefined'
-    throw new Error(`Unexpected 'undefined' in the path [${possibleSparseArrayPaths}] at index ${idx}`);
+    throw new Error(
+      `Unexpected 'undefined' in the path [${possibleSparseArrayPaths}] at index ${idx}`
+    );
   }
 
-  if (idx >= possibleSparseArrayPaths.length || data === null || isScalar(data)) {
+  if (
+    idx >= possibleSparseArrayPaths.length ||
+    data === null ||
+    isScalar(data)
+  ) {
     return;
   }
 
@@ -134,5 +174,9 @@ function tryRestoreSparseArray(data: NestedValue<JsonValue | undefined>, possibl
     return;
   }
 
-  tryRestoreSparseArray(data[prop], possibleSparseArrayPaths, idx + 1);
+  tryRestoreSparseArray(
+    (data as NestedObject<any>)[prop],
+    possibleSparseArrayPaths,
+    idx + 1
+  );
 }

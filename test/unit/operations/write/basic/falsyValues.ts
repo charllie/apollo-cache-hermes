@@ -10,7 +10,6 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
   describe(`falsy values`, () => {
-
     let snapshot: GraphSnapshot;
     beforeAll(() => {
       const result = createSnapshot(
@@ -22,8 +21,12 @@ describe(`operations.write`, () => {
     });
 
     it(`persists all falsy values`, () => {
-      jestExpect(snapshot.getNodeData(QueryRootId)).toEqual({ null: null, false: false, zero: 0, string: '' });
+      jestExpect(snapshot.getNodeData(QueryRootId)).toEqual({
+        null: null,
+        false: false,
+        zero: 0,
+        string: ''
+      });
     });
-
   });
 });

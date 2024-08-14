@@ -5,7 +5,6 @@ import { CacheContext } from '../../../../src/context/CacheContext';
 import { strictConfig } from '../../../helpers/context';
 
 describe(`writeFragment with no fragment`, () => {
-
   let hermes: Hermes;
   beforeAll(() => {
     hermes = new Hermes(new CacheContext(strictConfig));
@@ -24,10 +23,9 @@ describe(`writeFragment with no fragment`, () => {
         data: {
           id: 123,
           name: 'Gouda',
-          __typename: 'Viewer',
-        },
+          __typename: 'Viewer'
+        }
       });
     }).to.throw(/No operations are allowed when using a fragment as a query/i);
   });
-
 });

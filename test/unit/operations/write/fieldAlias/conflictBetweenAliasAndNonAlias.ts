@@ -12,12 +12,10 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // It just isn't very fruitful to unit test the individual steps of the write
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
 
   describe(`conflict between alias and non-alias, ordered based on selection sets`, () => {
-
     let snapshot: GraphSnapshot;
     beforeAll(() => {
       const mixQuery = query(`
@@ -36,13 +34,13 @@ describe(`operations.write`, () => {
       snapshot = write(context, empty, mixQuery, {
         user: {
           id: 1,
-          name: 'Foo',
+          name: 'Foo'
         },
         fullUserInfo: {
           id: 1,
           FirstName: 'FooBar',
-          contact: '555-555-5555',
-        },
+          contact: '555-555-5555'
+        }
       }).snapshot;
     });
 
@@ -51,8 +49,8 @@ describe(`operations.write`, () => {
         user: {
           id: 1,
           name: 'Foo',
-          phone: '555-555-5555',
-        },
+          phone: '555-555-5555'
+        }
       });
     });
 
@@ -63,14 +61,13 @@ describe(`operations.write`, () => {
             user: {
               id: 1,
               name: 'Foo',
-              phone: '555-555-5555',
-            },
+              phone: '555-555-5555'
+            }
           },
           /* inbound */ undefined,
-          /* outbound */ [{ id: '1', path: ['user'] }],
+          /* outbound */ [{ id: '1', path: ['user'] }]
         )
       );
     });
-
   });
 });

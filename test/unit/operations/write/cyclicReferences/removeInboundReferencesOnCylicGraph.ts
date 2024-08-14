@@ -8,7 +8,6 @@ import { createSnapshot, updateSnapshot } from '../../../../helpers';
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
   describe(`remove inbound references on cyclic graph`, () => {
-
     let snapshot: GraphSnapshot, editedNodeIds: Set<NodeId>;
     beforeAll(() => {
       const cyclicRefQuery = `{
@@ -33,9 +32,9 @@ describe(`operations.write`, () => {
               id: 2,
               name: 'Bar',
               fizz: { id: 1 },
-              buzz: { id: 2 },
-            },
-          },
+              buzz: { id: 2 }
+            }
+          }
         },
         cyclicRefQuery
       ).snapshot;
@@ -50,9 +49,9 @@ describe(`operations.write`, () => {
               id: 2,
               name: 'Bar',
               fizz: null,
-              buzz: null,
-            },
-          },
+              buzz: null
+            }
+          }
         },
         cyclicRefQuery
       );
@@ -76,7 +75,9 @@ describe(`operations.write`, () => {
     });
 
     it(`only marks the edited node`, () => {
-      jestExpect(Array.from(editedNodeIds)).toEqual(jestExpect.arrayContaining(['2']));
+      jestExpect(Array.from(editedNodeIds)).toEqual(
+        jestExpect.arrayContaining(['2'])
+      );
     });
   });
 });

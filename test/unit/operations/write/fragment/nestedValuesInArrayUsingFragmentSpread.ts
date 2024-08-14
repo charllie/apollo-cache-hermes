@@ -12,7 +12,6 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // It just isn't very fruitful to unit test the individual steps of the write
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
 
@@ -49,8 +48,8 @@ describe(`operations.write`, () => {
               title: 'Hello',
               details: {
                 body: 'Hello - body',
-                ref: 'Hello-ref',
-              },
+                ref: 'Hello-ref'
+              }
             },
             {
               createAt: '10/02',
@@ -58,11 +57,10 @@ describe(`operations.write`, () => {
               details: {
                 body: 'world - body',
                 ref: null
-                ,
-              },
-            },
-          ],
-        },
+              }
+            }
+          ]
+        }
       });
       snapshot = result.snapshot;
       editedNodeIds = result.editedNodeIds;
@@ -79,8 +77,8 @@ describe(`operations.write`, () => {
               title: 'Hello',
               details: {
                 body: 'Hello - body',
-                ref: 'Hello-ref',
-              },
+                ref: 'Hello-ref'
+              }
             },
             {
               createAt: '10/02',
@@ -88,11 +86,10 @@ describe(`operations.write`, () => {
               details: {
                 body: 'world - body',
                 ref: null
-                ,
-              },
-            },
-          ],
-        },
+              }
+            }
+          ]
+        }
       });
     });
 
@@ -106,8 +103,8 @@ describe(`operations.write`, () => {
             title: 'Hello',
             details: {
               body: 'Hello - body',
-              ref: 'Hello-ref',
-            },
+              ref: 'Hello-ref'
+            }
           },
           {
             createAt: '10/02',
@@ -115,19 +112,22 @@ describe(`operations.write`, () => {
             details: {
               body: 'world - body',
               ref: null
-              ,
-            },
-          },
-        ],
+            }
+          }
+        ]
       });
     });
 
     it(`emits the root as an EntitySnapshot`, () => {
-      jestExpect(snapshot.getNodeSnapshot(QueryRootId)).toBeInstanceOf(EntitySnapshot);
+      jestExpect(snapshot.getNodeSnapshot(QueryRootId)).toBeInstanceOf(
+        EntitySnapshot
+      );
     });
 
     it(`emits the entity as an EntitySnapshot`, () => {
-      jestExpect(snapshot.getNodeSnapshot('123')).toBeInstanceOf(EntitySnapshot);
+      jestExpect(snapshot.getNodeSnapshot('123')).toBeInstanceOf(
+        EntitySnapshot
+      );
     });
 
     it(`directly references viewer from the query root`, () => {
@@ -144,17 +144,22 @@ describe(`operations.write`, () => {
 
     it(`records the inbound reference from referenced entity`, () => {
       const queryRoot = snapshot.getNodeSnapshot('123')!;
-      jestExpect(queryRoot.inbound).toEqual([{ id: QueryRootId, path: ['viewer'] }]);
+      jestExpect(queryRoot.inbound).toEqual([
+        { id: QueryRootId, path: ['viewer'] }
+      ]);
       jestExpect(queryRoot.outbound).toBe(undefined);
     });
 
     it(`marks the entity and root as edited`, () => {
-      jestExpect(Array.from(editedNodeIds)).toEqual(jestExpect.arrayContaining([QueryRootId, '123']));
+      jestExpect(Array.from(editedNodeIds)).toEqual(
+        jestExpect.arrayContaining([QueryRootId, '123'])
+      );
     });
 
     it(`only contains the two nodes`, () => {
-      jestExpect(snapshot.allNodeIds()).toEqual(jestExpect.arrayContaining([QueryRootId, '123']));
+      jestExpect(snapshot.allNodeIds()).toEqual(
+        jestExpect.arrayContaining([QueryRootId, '123'])
+      );
     });
   });
-
 });

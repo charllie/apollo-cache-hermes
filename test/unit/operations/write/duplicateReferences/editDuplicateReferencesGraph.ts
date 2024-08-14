@@ -7,7 +7,6 @@ import { query, strictConfig } from '../../../../helpers';
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
   const listQuery = query(`{
@@ -22,7 +21,6 @@ describe(`operations.write`, () => {
   }`);
 
   describe(`edit duplicate-references graph`, () => {
-
     let snapshot: GraphSnapshot;
     beforeAll(() => {
       const { snapshot: baseSnapshot } = write(context, empty, listQuery, {
@@ -31,11 +29,12 @@ describe(`operations.write`, () => {
           { id: 'a', bar: { id: 1 } },
           { id: 'b', bar: { id: 1 } },
           { id: 'a', bar: { id: 1 } },
-          { id: 'b', bar: { id: 1 } },
+          { id: 'b', bar: { id: 1 } }
         ],
         baz: {
-          id: 'a', bar: { id: 1 },
-        },
+          id: 'a',
+          bar: { id: 1 }
+        }
       });
 
       const result = write(context, baseSnapshot, listQuery, {
@@ -44,11 +43,12 @@ describe(`operations.write`, () => {
           { id: 'a', bar: { id: 2 } },
           { id: 'b', bar: null },
           { id: 'a', bar: { id: 2 } },
-          { id: 'b', bar: null },
+          { id: 'b', bar: null }
         ],
         baz: {
-          id: 'a', bar: { id: 2 },
-        },
+          id: 'a',
+          bar: { id: 2 }
+        }
       });
       snapshot = result.snapshot;
     });
@@ -60,18 +60,19 @@ describe(`operations.write`, () => {
           { id: 'a', bar: { id: 2 } },
           { id: 'b', bar: null },
           { id: 'a', bar: { id: 2 } },
-          { id: 'b', bar: null },
+          { id: 'b', bar: null }
         ],
         baz: {
-          id: 'a', bar: { id: 2 },
-        },
+          id: 'a',
+          bar: { id: 2 }
+        }
       });
     });
 
     it(`doesn't insert duplicate outbound references`, () => {
-      jestExpect(snapshot.getNodeSnapshot('a')!.outbound).toEqual(jestExpect.arrayContaining([
-        { id: '2', path: ['bar'] },
-      ]));
+      jestExpect(snapshot.getNodeSnapshot('a')!.outbound).toEqual(
+        jestExpect.arrayContaining([{ id: '2', path: ['bar'] }])
+      );
       jestExpect(snapshot.getNodeSnapshot('b')!.outbound).toBe(undefined);
     });
 
@@ -80,9 +81,9 @@ describe(`operations.write`, () => {
     });
 
     it(`doesn't insert duplicate inbound references for targets`, () => {
-      jestExpect(snapshot.getNodeSnapshot('2')!.inbound).toEqual(jestExpect.arrayContaining([
-        { id: 'a', path: ['bar'] },
-      ]));
+      jestExpect(snapshot.getNodeSnapshot('2')!.inbound).toEqual(
+        jestExpect.arrayContaining([{ id: 'a', path: ['bar'] }])
+      );
     });
   });
 });

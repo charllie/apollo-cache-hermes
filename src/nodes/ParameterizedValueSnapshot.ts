@@ -24,7 +24,7 @@ export class ParameterizedValueSnapshot implements NodeSnapshot {
     /** Other node snapshots that point to this one. */
     inbound?: NodeReference[],
     /** The node snapshots that this one points to. */
-    outbound?: NodeReference[],
+    outbound?: NodeReference[]
   ) {
     if (inbound) {
       this.inbound = new Map();

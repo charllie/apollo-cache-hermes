@@ -5,7 +5,6 @@ import { CacheContext } from '../../../../src/context/CacheContext';
 import { strictConfig } from '../../../helpers/context';
 
 describe(`writeFragment with parameterized references within arrays`, () => {
-
   let hermes: Hermes;
   beforeAll(() => {
     hermes = new Hermes(new CacheContext(strictConfig));
@@ -33,7 +32,7 @@ describe(`writeFragment with parameterized references within arrays`, () => {
       `),
       variables: {
         city: 'Seattle',
-        area: 'PNW',
+        area: 'PNW'
       },
       data: {
         viewer: {
@@ -46,35 +45,36 @@ describe(`writeFragment with parameterized references within arrays`, () => {
               __typename: 'Shipment',
               address: {
                 street: 'pike',
-                postal: 98102,
+                postal: 98102
               },
               shipper: {
                 id: 'shipper0',
-                __typename: 'Shipper',
-              },
+                __typename: 'Shipper'
+              }
             },
             {
               id: 'shipment1',
               __typename: 'Shipment',
               address: {
                 street: 'pine',
-                postal: 98102,
+                postal: 98102
               },
               shipper: {
                 id: 'shipper1',
-                __typename: 'Shipper',
-              },
-            },
-          ],
-        },
-      },
+                __typename: 'Shipper'
+              }
+            }
+          ]
+        }
+      }
     });
   });
 
   it(`returns parameterized data`, () => {
-    expect(hermes.readFragment({
-      id: '123',
-      fragment: gql(`
+    expect(
+      hermes.readFragment({
+        id: '123',
+        fragment: gql(`
       fragment viewer on Viewer {
         id
         name
@@ -91,11 +91,12 @@ describe(`writeFragment with parameterized references within arrays`, () => {
         }
       }
     `),
-      variables: {
-        city: 'Seattle',
-        area: 'PNW',
-      },
-    })).to.deep.eq({
+        variables: {
+          city: 'Seattle',
+          area: 'PNW'
+        }
+      })
+    ).to.deep.eq({
       id: 123,
       name: 'Gouda',
       __typename: 'Viewer',
@@ -105,27 +106,26 @@ describe(`writeFragment with parameterized references within arrays`, () => {
           __typename: 'Shipment',
           address: {
             street: 'pike',
-            postal: 98102,
+            postal: 98102
           },
           shipper: {
             id: 'shipper0',
-            __typename: 'Shipper',
-          },
+            __typename: 'Shipper'
+          }
         },
         {
           id: 'shipment1',
           __typename: 'Shipment',
           address: {
             street: 'pine',
-            postal: 98102,
+            postal: 98102
           },
           shipper: {
             id: 'shipper1',
-            __typename: 'Shipper',
-          },
-        },
-      ],
+            __typename: 'Shipper'
+          }
+        }
+      ]
     });
   });
-
 });

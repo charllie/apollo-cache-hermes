@@ -19,20 +19,20 @@ function createNewCacheSnapshot(cacheContext: CacheContext) {
               id: 31,
               four: { five: 1 },
               color: 'blue',
-              __typename: 'THREE',
-            },
+              __typename: 'THREE'
+            }
           },
           {
             three: {
               id: 32,
               four: { five: 1 },
               color: 'gold',
-              __typename: 'THREE',
-            },
+              __typename: 'THREE'
+            }
           },
-          null,
-        ],
-      },
+          null
+        ]
+      }
     },
     `query nested($id: ID!) {
       one {
@@ -64,9 +64,9 @@ describe(`operations.migrate`, () => {
     const migrated = migrate(createNewCacheSnapshot(cacheContext), {
       _entities: {
         THREE: {
-          size: (_previous: JsonValue) => 1024,
-        },
-      },
+          size: (_previous: JsonValue) => 1024
+        }
+      }
     });
     const cacheAfter = extract(migrated.baseline, cacheContext);
 
@@ -79,28 +79,28 @@ describe(`operations.migrate`, () => {
     const nestedParameterizedValueId0 = nodeIdForParameterizedValue(
       '31',
       ['four'],
-      { extra: true },
+      { extra: true }
     );
 
     const nestedParameterizedValueId1 = nodeIdForParameterizedValue(
       '32',
       ['four'],
-      { extra: true },
+      { extra: true }
     );
 
     jestExpect(cacheAfter).toEqual({
       [QueryRootId]: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
-        outbound: [{ id: parameterizedTopContainerId, path: ['one', 'two'] }],
+        outbound: [{ id: parameterizedTopContainerId, path: ['one', 'two'] }]
       },
       [parameterizedTopContainerId]: {
         type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
         inbound: [{ id: QueryRootId, path: ['one', 'two'] }],
         outbound: [
           { id: '31', path: [0, 'three'] },
-          { id: '32', path: [1, 'three'] },
+          { id: '32', path: [1, 'three'] }
         ],
-        data: [{ three: undefined }, { three: undefined }, null],
+        data: [{ three: undefined }, { three: undefined }, null]
       },
       '31': {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
@@ -110,15 +110,15 @@ describe(`operations.migrate`, () => {
           id: 31,
           color: 'blue',
           size: 1024,
-          __typename: 'THREE',
-        },
+          __typename: 'THREE'
+        }
       },
       [nestedParameterizedValueId0]: {
         type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
         inbound: [{ id: '31', path: ['four'] }],
         data: {
-          five: 1,
-        },
+          five: 1
+        }
       },
       '32': {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
@@ -128,16 +128,16 @@ describe(`operations.migrate`, () => {
           id: 32,
           color: 'gold',
           size: 1024,
-          __typename: 'THREE',
-        },
+          __typename: 'THREE'
+        }
       },
       [nestedParameterizedValueId1]: {
         type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
         inbound: [{ id: '32', path: ['four'] }],
         data: {
-          five: 1,
-        },
-      },
+          five: 1
+        }
+      }
     });
   });
 
@@ -145,9 +145,9 @@ describe(`operations.migrate`, () => {
     const migrated = migrate(createNewCacheSnapshot(cacheContext), {
       _entities: {
         THREE: {
-          color: (previous: JsonValue) => `really ${previous}`,
-        },
-      },
+          color: (previous: JsonValue) => `really ${previous}`
+        }
+      }
     });
     const cacheAfter = extract(migrated.baseline, cacheContext);
 
@@ -160,28 +160,28 @@ describe(`operations.migrate`, () => {
     const nestedParameterizedValueId0 = nodeIdForParameterizedValue(
       '31',
       ['four'],
-      { extra: true },
+      { extra: true }
     );
 
     const nestedParameterizedValueId1 = nodeIdForParameterizedValue(
       '32',
       ['four'],
-      { extra: true },
+      { extra: true }
     );
 
     jestExpect(cacheAfter).toEqual({
       [QueryRootId]: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
-        outbound: [{ id: parameterizedTopContainerId, path: ['one', 'two'] }],
+        outbound: [{ id: parameterizedTopContainerId, path: ['one', 'two'] }]
       },
       [parameterizedTopContainerId]: {
         type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
         inbound: [{ id: QueryRootId, path: ['one', 'two'] }],
         outbound: [
           { id: '31', path: [0, 'three'] },
-          { id: '32', path: [1, 'three'] },
+          { id: '32', path: [1, 'three'] }
         ],
-        data: [{ three: undefined }, { three: undefined }, null],
+        data: [{ three: undefined }, { three: undefined }, null]
       },
       '31': {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
@@ -190,15 +190,15 @@ describe(`operations.migrate`, () => {
         data: {
           id: 31,
           color: 'really blue',
-          __typename: 'THREE',
-        },
+          __typename: 'THREE'
+        }
       },
       [nestedParameterizedValueId0]: {
         type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
         inbound: [{ id: '31', path: ['four'] }],
         data: {
-          five: 1,
-        },
+          five: 1
+        }
       },
       '32': {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
@@ -207,17 +207,16 @@ describe(`operations.migrate`, () => {
         data: {
           id: 32,
           color: 'really gold',
-          __typename: 'THREE',
-        },
+          __typename: 'THREE'
+        }
       },
       [nestedParameterizedValueId1]: {
         type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
         inbound: [{ id: '32', path: ['four'] }],
         data: {
-          five: 1,
-        },
-      },
+          five: 1
+        }
+      }
     });
   });
-
 });

@@ -15,23 +15,29 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // It just isn't very fruitful to unit test the individual steps of the write
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
 
   describe(`parameterized value with optional arguments`, () => {
-
-    let snapshot: GraphSnapshot, editedNodeIds: Set<NodeId>, parameterizedId: NodeId;
+    let snapshot: GraphSnapshot,
+      editedNodeIds: Set<NodeId>,
+      parameterizedId: NodeId;
     beforeAll(() => {
       const parameterizedQuery = query(
         `query getAFoo($one: Number, $two: String) {
           foo(a: $one, b:$two)
-        }`, { one: 1 }
+        }`,
+        { one: 1 }
       );
 
-      parameterizedId = nodeIdForParameterizedValue(QueryRootId, ['foo'], { a: 1, b: null });
+      parameterizedId = nodeIdForParameterizedValue(QueryRootId, ['foo'], {
+        a: 1,
+        b: null
+      });
 
-      const result = write(context, empty, parameterizedQuery, { foo: 'hello' });
+      const result = write(context, empty, parameterizedQuery, {
+        foo: 'hello'
+      });
       snapshot = result.snapshot;
       editedNodeIds = result.editedNodeIds;
     });
@@ -42,7 +48,9 @@ describe(`operations.write`, () => {
 
     it(`creates an outgoing reference from the field's container`, () => {
       const queryRoot = snapshot.getNodeSnapshot(QueryRootId)!;
-      jestExpect(queryRoot.outbound).toEqual([{ id: parameterizedId, path: ['foo'] }]);
+      jestExpect(queryRoot.outbound).toEqual([
+        { id: parameterizedId, path: ['foo'] }
+      ]);
     });
 
     it(`creates an inbound reference to the field's container`, () => {
@@ -51,16 +59,21 @@ describe(`operations.write`, () => {
     });
 
     it(`does not expose the parameterized field directly from its container`, () => {
-      jestExpect(_.get(snapshot.getNodeData(QueryRootId), 'foo')).toBe(undefined);
+      jestExpect(_.get(snapshot.getNodeData(QueryRootId), 'foo')).toBe(
+        undefined
+      );
     });
 
     it(`marks only the new field as edited`, () => {
-      jestExpect(Array.from(editedNodeIds)).toEqual(jestExpect.arrayContaining([parameterizedId]));
+      jestExpect(Array.from(editedNodeIds)).toEqual(
+        jestExpect.arrayContaining([parameterizedId])
+      );
     });
 
     it(`emits a ParameterizedValueSnapshot`, () => {
-      jestExpect(snapshot.getNodeSnapshot(parameterizedId)).toBeInstanceOf(ParameterizedValueSnapshot);
+      jestExpect(snapshot.getNodeSnapshot(parameterizedId)).toBeInstanceOf(
+        ParameterizedValueSnapshot
+      );
     });
-
   });
 });

@@ -1,13 +1,15 @@
 import { extract } from '../../../../../src/operations/extract';
 import { nodeIdForParameterizedValue } from '../../../../../src/operations/SnapshotEditor';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`top-level parameterized reference`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
@@ -16,8 +18,8 @@ describe(`operations.extract`, () => {
           foo: {
             id: 1,
             name: 'Foo',
-            extra: false,
-          },
+            extra: false
+          }
         },
         `query getAFoo($id: ID!) {
           foo(id: $id, withExtra: true) {
@@ -32,7 +34,8 @@ describe(`operations.extract`, () => {
     });
 
     it(`extracts JSON serialization object`, () => {
-      const parameterizedId = nodeIdForParameterizedValue(QueryRootId,
+      const parameterizedId = nodeIdForParameterizedValue(
+        QueryRootId,
         ['foo'],
         { id: 1, withExtra: true }
       );
@@ -40,13 +43,13 @@ describe(`operations.extract`, () => {
       jestExpect(extractResult).toEqual({
         [QueryRootId]: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
-          outbound: [{ id: parameterizedId, path: ['foo'] }],
+          outbound: [{ id: parameterizedId, path: ['foo'] }]
         },
         [parameterizedId]: {
           type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
           inbound: [{ id: QueryRootId, path: ['foo'] }],
           outbound: [{ id: '1', path: [] }],
-          data: null,
+          data: null
         },
         '1': {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
@@ -54,11 +57,10 @@ describe(`operations.extract`, () => {
           data: {
             id: 1,
             name: 'Foo',
-            extra: false,
-          },
-        },
+            extra: false
+          }
+        }
       });
     });
-
   });
 });

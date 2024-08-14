@@ -9,16 +9,22 @@ import { write } from './write';
 /**
  * Return a new graph snapshot pruned to just the shape of the given query
  */
-export function prune(context: CacheContext, snapshot: GraphSnapshot, raw: RawOperation) {
+export function prune(
+  context: CacheContext,
+  snapshot: GraphSnapshot,
+  raw: RawOperation
+) {
   const queryResult = read(context, raw, snapshot);
   const pruned = write(
     context,
     new GraphSnapshot(),
     raw,
-    queryResult.result && queryResult.complete ? queryResult.result : {} as JsonObject
+    queryResult.result && queryResult.complete
+      ? queryResult.result
+      : ({} as JsonObject)
   );
   return {
     snapshot: pruned.snapshot,
-    complete: queryResult.complete,
+    complete: queryResult.complete
   };
 }

@@ -12,7 +12,6 @@ export type Callback = (result: QueryResult) => void;
  * @internal
  */
 export class QueryObserver {
-
   /** Cache configuration/context to use when executing queries. */
   private _context: CacheContext;
   /** The query being observed. */
@@ -22,7 +21,12 @@ export class QueryObserver {
   /** The callback to trigger when observed nodes have changed. */
   private _callback: Callback;
 
-  constructor(context: CacheContext, query: RawOperation, snapshot: GraphSnapshot, callback: Callback) {
+  constructor(
+    context: CacheContext,
+    query: RawOperation,
+    snapshot: GraphSnapshot,
+    callback: Callback
+  ) {
     this._context = context;
     this._query = query;
     this._callback = callback;
@@ -65,8 +69,12 @@ export class QueryObserver {
     //
     // This effectively circumvents the logic in _hasUpdate (entityIds will be
     // undefined).
-    this._result = read(this._context, this._query, snapshot, this._context.strict);
+    this._result = read(
+      this._context,
+      this._query,
+      snapshot,
+      this._context.strict
+    );
     this._callback(this._result);
   }
-
 }

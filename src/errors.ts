@@ -18,7 +18,7 @@ function _expandMessage(messageOrDetails: MessageOrDetails, template: string) {
   const { message, ...details } = _toDetails(messageOrDetails);
   return {
     ...details,
-    message: template.replace('{{message}}', message),
+    message: template.replace('{{message}}', message)
   };
 }
 
@@ -47,9 +47,11 @@ export class QueryError extends HermesCacheError {
   constructor(
     messageOrDetails: MessageOrDetails,
     // The path within the query where the error occurred.
-    public readonly path: string[],
+    public readonly path: string[]
   ) {
-    super(_expandMessage(messageOrDetails, `{{message}} at ${prettyPath(path)}`));
+    super(
+      _expandMessage(messageOrDetails, `{{message}} at ${prettyPath(path)}`)
+    );
   }
 }
 
@@ -69,9 +71,15 @@ export class ConflictingFieldsError extends QueryError {
     // The path within the query where the error occurred.
     public readonly path: string[],
     // The fields that are conflicting
-    public readonly fields: any[],
+    public readonly fields: any[]
   ) {
-    super(_expandMessage(messageOrDetails, `Conflicting field definitions: {{message}}`), path);
+    super(
+      _expandMessage(
+        messageOrDetails,
+        `Conflicting field definitions: {{message}}`
+      ),
+      path
+    );
   }
 }
 
@@ -89,9 +97,14 @@ export class OperationError extends HermesCacheError {
     // The path within the node where the error occurred.
     public readonly path: PathPart[],
     // A value associated with the error.
-    public readonly value?: any,
+    public readonly value?: any
   ) {
-    super(_expandMessage(messageOrDetails, `{{message}} at ${prettyPath([...prefixPath, ...path])} (node ${nodeId})`));
+    super(
+      _expandMessage(
+        messageOrDetails,
+        `{{message}} at ${prettyPath([...prefixPath, ...path])} (node ${nodeId})`
+      )
+    );
   }
 }
 
@@ -113,9 +126,14 @@ export class CacheConsistencyError extends OperationError {
     // The path within the node where the error occurred.
     public readonly path: PathPart[],
     // A value that is the subject of the error
-    public readonly value?: any,
+    public readonly value?: any
   ) {
-    super(_expandMessage(messageOrDetails, `Hermes BUG: {{message}}`), prefixPath, nodeId, path);
+    super(
+      _expandMessage(messageOrDetails, `Hermes BUG: {{message}}`),
+      prefixPath,
+      nodeId,
+      path
+    );
   }
 }
 

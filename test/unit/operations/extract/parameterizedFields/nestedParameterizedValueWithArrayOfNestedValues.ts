@@ -1,13 +1,15 @@
 import { extract } from '../../../../../src/operations/extract';
 import { nodeIdForParameterizedValue } from '../../../../../src/operations/SnapshotEditor';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`nested parameterized value with an array of nested values`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
@@ -17,17 +19,17 @@ describe(`operations.extract`, () => {
             two: [
               {
                 three: {
-                  threeValue: 'first',
-                },
+                  threeValue: 'first'
+                }
               },
               {
                 three: {
-                  threeValue: 'second',
-                },
+                  threeValue: 'second'
+                }
               },
-              null,
-            ],
-          },
+              null
+            ]
+          }
         },
         `query nested($id: ID!) {
           one {
@@ -55,7 +57,7 @@ describe(`operations.extract`, () => {
       jestExpect(extractResult).toEqual({
         [QueryRootId]: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
-          outbound: [{ id: parameterizedId, path: ['one', 'two'] }],
+          outbound: [{ id: parameterizedId, path: ['one', 'two'] }]
         },
         [parameterizedId]: {
           type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
@@ -63,19 +65,18 @@ describe(`operations.extract`, () => {
           data: [
             {
               three: {
-                threeValue: 'first',
-              },
+                threeValue: 'first'
+              }
             },
             {
               three: {
-                threeValue: 'second',
-              },
+                threeValue: 'second'
+              }
             },
-            null,
-          ],
-        },
+            null
+          ]
+        }
       });
     });
-
   });
 });

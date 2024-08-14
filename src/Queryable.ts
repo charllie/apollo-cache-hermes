@@ -7,7 +7,6 @@ import { DocumentNode } from './util';
  * views, etc).
  */
 export interface Queryable {
-
   /**
    * Performs any transformations of operation documents.
    *
@@ -22,7 +21,10 @@ export interface Queryable {
    * TODO: Can we drop non-optimistic reads?
    * https://github.com/apollographql/apollo-client/issues/1971#issuecomment-319402170
    */
-  read(query: RawOperation, optimistic?: boolean): { result?: JsonValue, complete: boolean };
+  read(
+    query: RawOperation,
+    optimistic?: boolean
+  ): { result?: JsonValue; complete: boolean };
 
   /**
    * Writes values for a selection to the cache.

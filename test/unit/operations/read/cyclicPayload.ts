@@ -4,7 +4,6 @@ import { QueryResult, read, write } from '../../../../src/operations';
 import { query, strictConfig } from '../../../helpers';
 
 describe(`operations.read`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
 
@@ -32,7 +31,10 @@ describe(`operations.read`, () => {
       const bar = { id: 1, name: 'Bar', fizz: null, buzz: null, foo };
       foo.bar = bar;
 
-      const { snapshot } = write(context, empty, cyclicQuery, { foo, baz: null });
+      const { snapshot } = write(context, empty, cyclicQuery, {
+        foo,
+        baz: null
+      });
       readResult = read(context, cyclicQuery, snapshot);
     });
 
@@ -45,19 +47,18 @@ describe(`operations.read`, () => {
       // non-references!
       const foo = {
         id: 0,
-        name: 'Foo',
+        name: 'Foo'
       };
       const bar = {
         id: 1,
         name: 'Bar',
         fizz: null,
         buzz: null,
-        foo,
+        foo
       };
       foo['bar'] = bar;
 
       jestExpect(readResult.result).toEqual({ foo });
     });
   });
-
 });

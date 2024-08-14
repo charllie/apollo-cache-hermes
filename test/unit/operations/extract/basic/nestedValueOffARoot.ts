@@ -1,12 +1,14 @@
 import { extract } from '../../../../../src/operations/extract';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`nested values hanging off of a root`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
@@ -17,10 +19,10 @@ describe(`operations.extract`, () => {
             prop1: 'hello',
             prop2: {
               nestedProp1: 1000,
-              nestedProp2: 'world',
+              nestedProp2: 'world'
             },
-            prop3: ['hello', 'world'],
-          },
+            prop3: ['hello', 'world']
+          }
         },
         `{
           bar {
@@ -46,14 +48,13 @@ describe(`operations.extract`, () => {
               prop1: 'hello',
               prop2: {
                 nestedProp1: 1000,
-                nestedProp2: 'world',
+                nestedProp2: 'world'
               },
-              prop3: ['hello', 'world'],
-            },
-          },
-        },
+              prop3: ['hello', 'world']
+            }
+          }
+        }
       });
     });
-
   });
 });

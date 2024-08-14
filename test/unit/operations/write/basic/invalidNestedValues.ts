@@ -6,14 +6,13 @@ import { createSnapshot } from '../../../../helpers';
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
   describe(`invalid nested values, scalar in place of object value`, () => {
-
     it(`creates the query root, with the values`, () => {
       jestExpect(() => {
         createSnapshot(
           {
             foo: {
-              bar: 'THIS IS A STRING NOT OBJECT',
-            },
+              bar: 'THIS IS A STRING NOT OBJECT'
+            }
           },
           `{
             foo {
@@ -27,6 +26,5 @@ describe(`operations.write`, () => {
         );
       }).toThrow(/foo\.bar/);
     });
-
   });
 });

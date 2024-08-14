@@ -15,7 +15,7 @@ export function removeNodeReference(
   direction: ReferenceDirection,
   snapshot: NodeSnapshot,
   id: NodeId,
-  path: PathPart[],
+  path: PathPart[]
 ): boolean {
   const references = snapshot[direction];
   if (!references) return true;
@@ -35,7 +35,7 @@ export function addNodeReference(
   direction: ReferenceDirection,
   snapshot: NodeSnapshot,
   id: NodeId,
-  path: PathPart[],
+  path: PathPart[]
 ): boolean {
   if (!snapshot[direction]) {
     snapshot[direction] = new Map();
@@ -58,7 +58,7 @@ export function hasNodeReference(
   snapshot: NodeSnapshot,
   type: ReferenceDirection,
   id: NodeId,
-  path: PathPart[],
+  path: PathPart[]
 ): boolean {
   const references = snapshot[type];
   const reference = references && references.get(id);
@@ -68,7 +68,9 @@ export function hasNodeReference(
 /**
  * Return values from reference map
  */
-export function referenceValues(references: Map<NodeId, NodeReference> | undefined): NodeReference[] {
+export function referenceValues(
+  references: Map<NodeId, NodeReference> | undefined
+): NodeReference[] {
   if (!references) {
     return [];
   }
@@ -80,8 +82,10 @@ export function referenceValues(references: Map<NodeId, NodeReference> | undefin
  */
 export function isReferenceField(
   snapshot: NodeSnapshot,
-  path: PathPart[],
+  path: PathPart[]
 ): boolean {
   const references = snapshot['outbound'];
-  return referenceValues(references).some(reference => isEqual(reference.path, path));
+  return referenceValues(references).some(reference =>
+    isEqual(reference.path, path)
+  );
 }

@@ -4,7 +4,6 @@ import { QueryResult, read, write } from '../../../../src/operations';
 import { query, silentConfig } from '../../../helpers';
 
 describe(`operations.read`, () => {
-
   const context = new CacheContext(silentConfig);
   const empty = new GraphSnapshot();
   const shipmentsQuery = query(`{
@@ -29,7 +28,6 @@ describe(`operations.read`, () => {
   }`);
 
   describe(`incomplete payload`, () => {
-
     let snapshot: GraphSnapshot;
     let readResult: QueryResult;
 
@@ -41,51 +39,45 @@ describe(`operations.read`, () => {
             driver: {
               name: 'Bob',
               id: 'Bob-d0',
-              messages: [
-                { details: 'Hello' },
-                { details: 'world' },
-              ],
-              seniority: 10,
+              messages: [{ details: 'Hello' }, { details: 'world' }],
+              seniority: 10
             },
             stopEtaSummary: [
               {
                 id: 'eta0',
-                type: 'warning',
+                type: 'warning'
               },
               {
                 id: 'eta1',
-                type: 'warning',
-              },
+                type: 'warning'
+              }
             ],
             vehicle: {
-              capacity: 100,
-            },
+              capacity: 100
+            }
           },
           {
             id: '1',
             driver: {
               name: 'Joe',
               id: 'Joe-d1',
-              messages: [
-                { details: 'Hello' },
-              ],
-              seniority: 20,
+              messages: [{ details: 'Hello' }],
+              seniority: 20
             },
             stopEtaSummary: [
               {
                 id: 'eta0',
-                type: 'warning',
-              },
+                type: 'warning'
+              }
             ],
             vehicle: {
-              capacity: 200,
-            },
+              capacity: 200
+            }
           },
           {
-            driver: {
-            },
-          },
-        ],
+            driver: {}
+          }
+        ]
       }).snapshot;
       readResult = read(context, shipmentsQuery, snapshot);
     });
@@ -102,45 +94,40 @@ describe(`operations.read`, () => {
             driver: {
               name: 'Bob',
               id: 'Bob-d0',
-              messages: [
-                { details: 'Hello' },
-                { details: 'world' },
-              ],
-              seniority: 10,
+              messages: [{ details: 'Hello' }, { details: 'world' }],
+              seniority: 10
             },
             stopEtaSummary: [
               {
                 id: 'eta0',
-                type: 'warning',
+                type: 'warning'
               },
               {
                 id: 'eta1',
-                type: 'warning',
-              },
+                type: 'warning'
+              }
             ],
             vehicle: {
-              capacity: 100,
-            },
+              capacity: 100
+            }
           },
           {
             id: '1',
             driver: {
               name: 'Joe',
               id: 'Joe-d1',
-              messages: [
-                { details: 'Hello' },
-              ],
-              seniority: 20,
+              messages: [{ details: 'Hello' }],
+              seniority: 20
             },
             stopEtaSummary: [
               {
                 id: 'eta0',
-                type: 'warning',
-              },
+                type: 'warning'
+              }
             ],
             vehicle: {
-              capacity: 200,
-            },
+              capacity: 200
+            }
           },
           {
             id: null,
@@ -148,15 +135,13 @@ describe(`operations.read`, () => {
               name: null,
               id: null,
               messages: null,
-              seniority: null,
+              seniority: null
             },
             stopEtaSummary: null,
-            vehicle: null,
-          },
-        ],
+            vehicle: null
+          }
+        ]
       });
     });
-
   });
-
 });

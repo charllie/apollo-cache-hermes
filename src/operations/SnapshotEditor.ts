@@ -1,9 +1,14 @@
 import isEqual from '@wry/equality';
-
+import * as _ from 'lodash';
 import { CacheContext } from '../context';
 import { InvalidPayloadError, OperationError } from '../errors';
 import { GraphSnapshot } from '../GraphSnapshot';
-import { cloneNodeSnapshot, EntitySnapshot, NodeSnapshot, ParameterizedValueSnapshot } from '../nodes';
+import {
+  cloneNodeSnapshot,
+  EntitySnapshot,
+  NodeSnapshot,
+  ParameterizedValueSnapshot
+} from '../nodes';
 import { FieldArguments, ParsedQuery } from '../ParsedQueryNode';
 import { JsonArray, JsonObject, JsonValue, Nil, PathPart } from '../primitive';
 import { NodeId, OperationInstance, RawOperation } from '../schema';
@@ -16,7 +21,7 @@ import {
   lazyImmutableDeepSet,
   pathBeginsWith,
   referenceValues,
-  removeNodeReference,
+  removeNodeReference
 } from '../util';
 
 const ensureIdConstistencyMsg = `Ensure id is included (or not included) consistently across multiple requests.`;
@@ -55,7 +60,6 @@ export type NodeSnapshotMap = { [Key in NodeId]?: NodeSnapshot };
  * node, while preserving immutability of the parent snapshot.
  */
 export class SnapshotEditor {
-
   /**
    * Tracks all node snapshots that have changed vs the parent snapshot.
    */
@@ -82,14 +86,17 @@ export class SnapshotEditor {
     /** The configuration/context to use when editing snapshots. */
     private _context: CacheContext,
     /** The snapshot to base edits off of. */
-    private _parent: GraphSnapshot,
+    private _parent: GraphSnapshot
   ) {}
 
   /**
    * Merge a GraphQL payload (query/fragment/etc) into the snapshot, rooted at
    * the node identified by `rootId`.
    */
-  mergePayload(query: RawOperation, payload: JsonObject): { warnings?: string[] } {
+  mergePayload(
+    query: RawOperation,
+    payload: JsonObject
+  ): { warnings?: string[] } {
     const parsed = this._context.parseOperation(query);
 
     // We collect all warnings associated with this operation to avoid
@@ -101,7 +108,15 @@ export class SnapshotEditor {
     // once all new nodes have been built (and we can guarantee that we're
     // referencing the correct version).
     const referenceEdits: ReferenceEdit[] = [];
-    this._mergeSubgraph(referenceEdits, warnings, parsed.rootId, [] /* prefixPath */, [] /* path */, parsed.parsedQuery, payload);
+    this._mergeSubgraph(
+      referenceEdits,
+      warnings,
+      parsed.rootId,
+      [] /* prefixPath */,
+      [] /* path */,
+      parsed.parsedQuery,
+      payload
+    );
 
     // Now that we have new versions of every edited node, we can point all the
     // edited references to the correct nodes.
@@ -131,7 +146,7 @@ export class SnapshotEditor {
     prefixPath: PathPart[],
     path: PathPart[],
     parsed: ParsedQuery,
-    payload: JsonValue | undefined,
+    payload: JsonValue | undefined
   ) {
     // Don't trust our inputs; we can receive values that aren't JSON
     // serializable via optimistic updates.
@@ -142,7 +157,13 @@ export class SnapshotEditor {
     // We should only ever reach a subgraph if it is a container (object/array).
     if (typeof payload !== 'object') {
       const message = `Received a ${typeof payload} value, but expected an object/array/null`;
-      throw new InvalidPayloadError(message, prefixPath, containerId, path, payload);
+      throw new InvalidPayloadError(
+        message,
+        prefixPath,
+        containerId,
+        path,
+        payload
+      );
     }
 
     // TODO(ianm): We're doing this a lot.  How much is it impacting perf?
@@ -151,13 +172,34 @@ export class SnapshotEditor {
     // Recurse into arrays.
     if (Array.isArray(payload) || Array.isArray(previousValue)) {
       if (!isNil(previousValue) && !Array.isArray(previousValue)) {
-        throw new InvalidPayloadError(`Unsupported transition from a non-list to list value`, prefixPath, containerId, path, payload);
+        throw new InvalidPayloadError(
+          `Unsupported transition from a non-list to list value`,
+          prefixPath,
+          containerId,
+          path,
+          payload
+        );
       }
       if (!isNil(payload) && !Array.isArray(payload)) {
-        throw new InvalidPayloadError(`Unsupported transition from a list to a non-list value`, prefixPath, containerId, path, payload);
+        throw new InvalidPayloadError(
+          `Unsupported transition from a list to a non-list value`,
+          prefixPath,
+          containerId,
+          path,
+          payload
+        );
       }
 
-      this._mergeArraySubgraph(referenceEdits, warnings, containerId, prefixPath, path, parsed, payload, previousValue);
+      this._mergeArraySubgraph(
+        referenceEdits,
+        warnings,
+        containerId,
+        prefixPath,
+        path,
+        parsed,
+        payload,
+        previousValue
+      );
       return;
     }
 
@@ -169,16 +211,34 @@ export class SnapshotEditor {
       // It is invalid to transition from a *value* with an id to one without.
       if (!isNil(payload) && !payloadId) {
         const message = `Unsupported transition from an entity to a non-entity value. ${ensureIdConstistencyMsg}`;
-        throw new InvalidPayloadError(message, prefixPath, containerId, path, payload);
+        throw new InvalidPayloadError(
+          message,
+          prefixPath,
+          containerId,
+          path,
+          payload
+        );
       }
       // The reverse is also invalid.
       if (!isNil(previousValue) && !previousId) {
         const message = `Unsupported transition from a non-entity value to an entity. ${ensureIdConstistencyMsg}`;
-        throw new InvalidPayloadError(message, prefixPath, containerId, path, payload);
+        throw new InvalidPayloadError(
+          message,
+          prefixPath,
+          containerId,
+          path,
+          payload
+        );
       }
       // Double check that our id generator is behaving properly.
       if (payloadId && isNil(payload)) {
-        throw new OperationError(`entityIdForNode emitted an id for a nil payload value`, prefixPath, containerId, path, payload);
+        throw new OperationError(
+          `entityIdForNode emitted an id for a nil payload value`,
+          prefixPath,
+          containerId,
+          path,
+          payload
+        );
       }
 
       // Fix references. See: orphan node tests on "orphan a subgraph" The new
@@ -188,13 +248,13 @@ export class SnapshotEditor {
         containerId,
         path,
         prevNodeId: previousId,
-        nextNodeId: payloadId,
+        nextNodeId: payloadId
       });
 
       // Nothing more to do here; the reference edit will null out this field.
       if (!payloadId) return;
 
-    // End of the line for a non-reference.
+      // End of the line for a non-reference.
     } else if (isNil(payload)) {
       if (previousValue !== null) {
         this._setValue(containerId, path, null, true);
@@ -222,12 +282,20 @@ export class SnapshotEditor {
         // And if it was explicitly undefined, that likely indicates a malformed
         // input (mutation, direct write).
         if (payload && payloadName in payload) {
-          warnings.push(`Encountered undefined at ${[...prefixPath, ...path].join('.')}. Treating as null`);
+          warnings.push(
+            `Encountered undefined at ${[...prefixPath, ...path].join('.')}. Treating as null`
+          );
         }
 
         if (this._context.addTypename && payloadName === '__typename') {
           const message = `Encountered undefined payload value for __typename which will override __typename value on existing fragment`;
-          throw new InvalidPayloadError(message, prefixPath, containerId, path, payload);
+          throw new InvalidPayloadError(
+            message,
+            prefixPath,
+            containerId,
+            path,
+            payload
+          );
         }
       }
 
@@ -286,25 +354,40 @@ export class SnapshotEditor {
       if (node.args) {
         // The values of a parameterized field are explicit nodes in the graph;
         // so we set up a new container & path.
-        containerIdForField = this._ensureParameterizedValueSnapshot(containerId, fieldPath, node.args);
+        containerIdForField = this._ensureParameterizedValueSnapshot(
+          containerId,
+          fieldPath,
+          node.args
+        );
         fieldPrefixPath = [...prefixPath, ...fieldPath];
         fieldPath = [];
       }
 
       // Note that we're careful to fetch the value of our new container; not
       // the outer container.
-      const previousFieldValue = deepGet(this._getNodeData(containerIdForField), fieldPath);
+      const previousFieldValue = deepGet(
+        this._getNodeData(containerIdForField),
+        fieldPath
+      );
 
       // For fields with sub selections, we walk into them; only leaf fields are
       // directly written via _setValue.  This allows us to perform minimal
       // edits to the graph.
       if (node.children) {
-        this._mergeSubgraph(referenceEdits, warnings, containerIdForField, fieldPrefixPath, fieldPath, node.children, fieldValue);
+        this._mergeSubgraph(
+          referenceEdits,
+          warnings,
+          containerIdForField,
+          fieldPrefixPath,
+          fieldPath,
+          node.children,
+          fieldValue
+        );
 
-      // We've hit a leaf field.
-      //
-      // Note that we must perform a _deep_ equality check here, to cover cases
-      // where a leaf value is a complex object.
+        // We've hit a leaf field.
+        //
+        // Note that we must perform a _deep_ equality check here, to cover cases
+        // where a leaf value is a complex object.
       } else if (!isEqual(fieldValue, previousFieldValue)) {
         // We intentionally do not deep copy the nodeValue as Apollo will
         // then perform Object.freeze anyway. So any change in the payload
@@ -329,7 +412,7 @@ export class SnapshotEditor {
     path: PathPart[],
     parsed: ParsedQuery,
     payload: JsonArray | Nil,
-    previousValue: JsonArray | Nil,
+    previousValue: JsonArray | Nil
   ) {
     if (isNil(payload)) {
       // Note that we mark this as an edit, as this method is only ever called
@@ -348,12 +431,18 @@ export class SnapshotEditor {
     // So, we resize the array to our desired size before walking.
     if (payloadLength !== previousLength || !previousValue) {
       const newArray = Array.isArray(previousValue)
-        ? previousValue.slice(0, payloadLength) : new Array(payloadLength);
+        ? previousValue.slice(0, payloadLength)
+        : new Array(payloadLength);
       this._setValue(containerId, path, newArray);
 
       // Drop any extraneous references.
       if (payloadLength < previousLength) {
-        this._removeArrayReferences(referenceEdits, containerId, path, payloadLength - 1);
+        this._removeArrayReferences(
+          referenceEdits,
+          containerId,
+          path,
+          payloadLength - 1
+        );
       }
     }
 
@@ -367,20 +456,37 @@ export class SnapshotEditor {
         childPayload = null;
 
         if (i in payload) {
-          warnings.push(`Encountered undefined at ${[...path, i].join('.')}. Treating as null`);
+          warnings.push(
+            `Encountered undefined at ${[...path, i].join('.')}. Treating as null`
+          );
         } else {
-          warnings.push(`Encountered hole in array at ${[...path, i].join('.')}. Filling with null`);
+          warnings.push(
+            `Encountered hole in array at ${[...path, i].join('.')}. Filling with null`
+          );
         }
       }
 
-      this._mergeSubgraph(referenceEdits, warnings, containerId, prefixPath, [...path, i], parsed, childPayload);
+      this._mergeSubgraph(
+        referenceEdits,
+        warnings,
+        containerId,
+        prefixPath,
+        [...path, i],
+        parsed,
+        childPayload
+      );
     }
   }
 
   /**
    *
    */
-  private _removeArrayReferences(referenceEdits: ReferenceEdit[], containerId: NodeId, prefix: PathPart[], afterIndex: number) {
+  private _removeArrayReferences(
+    referenceEdits: ReferenceEdit[],
+    containerId: NodeId,
+    prefix: PathPart[],
+    afterIndex: number
+  ) {
     const container = this._getNodeSnapshot(containerId);
     if (!container || !container.outbound) return;
     for (const reference of referenceValues(container.outbound)) {
@@ -395,7 +501,7 @@ export class SnapshotEditor {
         path: reference.path,
         prevNodeId: reference.id,
         nextNodeId: undefined,
-        noWrite: true,
+        noWrite: true
       });
     }
   }
@@ -409,7 +515,13 @@ export class SnapshotEditor {
   private _mergeReferenceEdits(referenceEdits: ReferenceEdit[]) {
     const orphanedNodeIds: Set<NodeId> = new Set();
 
-    for (const { containerId, path, prevNodeId, nextNodeId, noWrite } of referenceEdits) {
+    for (const {
+      containerId,
+      path,
+      prevNodeId,
+      nextNodeId,
+      noWrite
+    } of referenceEdits) {
       if (!noWrite) {
         const target = nextNodeId ? this._getNodeData(nextNodeId) : null;
         this._setValue(containerId, path, target);
@@ -454,7 +566,7 @@ export class SnapshotEditor {
     return {
       snapshot,
       editedNodeIds: this._editedNodeIds,
-      writtenQueries: this._writtenQueries,
+      writtenQueries: this._writtenQueries
     };
   }
 
@@ -463,7 +575,7 @@ export class SnapshotEditor {
    */
   _buildNewSnapshot() {
     const { entityTransformer } = this._context;
-    const snapshots = { ...this._parent._values };
+    const snapshots = _.clone(this._parent._values);
 
     for (const id in this._newNodes) {
       const newSnapshot = this._newNodes[id];
@@ -534,7 +646,9 @@ export class SnapshotEditor {
    * Retrieve the _latest_ version of a node snapshot.
    */
   private _getNodeSnapshot(id: NodeId) {
-    return id in this._newNodes ? this._newNodes[id] : this._parent.getNodeSnapshot(id);
+    return id in this._newNodes
+      ? this._newNodes[id]
+      : this._parent.getNodeSnapshot(id);
   }
 
   /**
@@ -552,14 +666,24 @@ export class SnapshotEditor {
    * This will not shallow clone objects/arrays along `path` if they were
    * previously cloned during this transaction.
    */
-  private _setValue(id: NodeId, path: PathPart[], newValue: any, isEdit = true) {
+  private _setValue(
+    id: NodeId,
+    path: PathPart[],
+    newValue: any,
+    isEdit = true
+  ) {
     if (isEdit) {
       this._editedNodeIds.add(id);
     }
 
     const parent = this._parent.getNodeSnapshot(id);
     const current = this._ensureNewSnapshot(id);
-    current.data = lazyImmutableDeepSet(current.data, parent && parent.data, path, newValue);
+    current.data = lazyImmutableDeepSet(
+      current.data,
+      parent && parent.data,
+      path,
+      newValue
+    );
   }
 
   /**
@@ -577,7 +701,9 @@ export class SnapshotEditor {
     // TODO: We're assuming that the only time we call _ensureNewSnapshot when
     // there is no parent is when the node is an entity.  Can we enforce it, or
     // pass a type through?
-    const newSnapshot = parent ? cloneNodeSnapshot(parent) : new EntitySnapshot();
+    const newSnapshot = parent
+      ? cloneNodeSnapshot(parent)
+      : new EntitySnapshot();
     this._newNodes[id] = newSnapshot;
     return newSnapshot;
   }
@@ -586,30 +712,45 @@ export class SnapshotEditor {
    * Ensures that there is a ParameterizedValueSnapshot for the given node with
    * arguments
    */
-  private _ensureParameterizedValueSnapshot(containerId: NodeId, path: PathPart[], args: FieldArguments) {
+  private _ensureParameterizedValueSnapshot(
+    containerId: NodeId,
+    path: PathPart[],
+    args: FieldArguments
+  ) {
     const fieldId = nodeIdForParameterizedValue(containerId, path, args);
 
     // We're careful to not edit the container unless we absolutely have to.
     // (There may be no changes for this parameterized value).
     const containerSnapshot = this._getNodeSnapshot(containerId);
-    if (!containerSnapshot || !hasNodeReference(containerSnapshot, 'outbound', fieldId, path)) {
+    if (
+      !containerSnapshot ||
+      !hasNodeReference(containerSnapshot, 'outbound', fieldId, path)
+    ) {
       // We need to construct a new snapshot otherwise.
       const newSnapshot = new ParameterizedValueSnapshot();
       addNodeReference('inbound', newSnapshot, containerId, path);
       this._newNodes[fieldId] = newSnapshot;
 
       // Ensure that the container points to it.
-      addNodeReference('outbound', this._ensureNewSnapshot(containerId), fieldId, path);
+      addNodeReference(
+        'outbound',
+        this._ensureNewSnapshot(containerId),
+        fieldId,
+        path
+      );
     }
 
     return fieldId;
   }
-
 }
 
 /**
  * Generate a stable id for a parameterized value.
  */
-export function nodeIdForParameterizedValue(containerId: NodeId, path: PathPart[], args?: JsonObject) {
+export function nodeIdForParameterizedValue(
+  containerId: NodeId,
+  path: PathPart[],
+  args?: JsonObject
+) {
   return `${containerId}❖${JSON.stringify(path)}❖${JSON.stringify(args)}`;
 }

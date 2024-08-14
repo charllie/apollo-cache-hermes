@@ -10,21 +10,14 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
   describe(`simple leaf-values hanging off a root`, () => {
-
     let snapshot: GraphSnapshot;
     beforeAll(() => {
       const result = createSnapshot(
         {
           rows: [
-            [
-              { value: 1 },
-              { value: 2 },
-            ],
-            [
-              { value: 3 },
-              { value: 4 },
-            ],
-          ],
+            [{ value: 1 }, { value: 2 }],
+            [{ value: 3 }, { value: 4 }]
+          ]
         },
         `{
           rows {
@@ -38,18 +31,10 @@ describe(`operations.write`, () => {
     it(`creates the query root, with the values`, () => {
       jestExpect(snapshot.getNodeData(QueryRootId)).toEqual({
         rows: [
-          [
-            { value: 1 },
-            { value: 2 },
-          ],
-          [
-            { value: 3 },
-            { value: 4 },
-          ],
-        ],
+          [{ value: 1 }, { value: 2 }],
+          [{ value: 3 }, { value: 4 }]
+        ]
       });
     });
-
   });
-
 });

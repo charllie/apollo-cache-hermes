@@ -4,7 +4,6 @@ import { query, strictConfig } from '../../../helpers';
 
 describe(`context.CacheContext`, () => {
   describe(`entity updaters`, () => {
-
     const activeUsersQuery = query(`{
       activeUsers { __typename id name active }
     }`);
@@ -22,11 +21,15 @@ describe(`context.CacheContext`, () => {
         if (nextActive === prevActive) return;
 
         const userId = user ? user.id : previous.id;
-        const { activeUsers } = dataProxy.readQuery({ query: activeUsersQuery.document });
+        const { activeUsers } = dataProxy.readQuery<{ activeUsers: any[] }>({
+          query: activeUsersQuery.document
+        });
         let newActiveUsers: any[];
         if (!nextActive) {
           // Remove users once they're no longer active.
-          newActiveUsers = activeUsers.filter((activeUser: any) => activeUser.id !== userId);
+          newActiveUsers = activeUsers.filter(
+            (activeUser: any) => activeUser.id !== userId
+          );
         } else if (activeUsers.findIndex((u: any) => u.id === userId) === -1) {
           // Insert newly active users if they're not already in the list.
           newActiveUsers = [...activeUsers, user];
@@ -38,11 +41,11 @@ describe(`context.CacheContext`, () => {
 
         dataProxy.writeQuery({
           query: activeUsersQuery.document,
-          data: { activeUsers: newActiveUsers },
+          data: { activeUsers: newActiveUsers }
         });
       },
 
-      Query() {},
+      Query() {}
     };
 
     const userUpdater = jest.spyOn(entityUpdaters, 'User');
@@ -54,8 +57,8 @@ describe(`context.CacheContext`, () => {
       cache.write(activeUsersQuery, {
         activeUsers: [
           { __typename: 'User', id: 1, name: 'Gouda', active: true },
-          { __typename: 'User', id: 2, name: 'Munster', active: true },
-        ],
+          { __typename: 'User', id: 2, name: 'Munster', active: true }
+        ]
       });
 
       userUpdater.mockClear();
@@ -63,38 +66,54 @@ describe(`context.CacheContext`, () => {
     });
 
     it(`triggers updaters when an entity is first seen`, () => {
-      cache.write({ ...getUserQuery, variables: { id: 3 } }, {
-        user: { __typename: 'User', id: 3, name: 'Cheddar', active: true },
-      });
+      cache.write(
+        { ...getUserQuery, variables: { id: 3 } },
+        {
+          user: { __typename: 'User', id: 3, name: 'Cheddar', active: true }
+        }
+      );
 
       expect(userUpdater.mock.calls.length).to.eq(1);
       const [, user, previous] = userUpdater.mock.calls[0];
-      expect(user).to.deep.eq({ __typename: 'User', id: 3, name: 'Cheddar', active: true });
+      expect(user).to.deep.eq({
+        __typename: 'User',
+        id: 3,
+        name: 'Cheddar',
+        active: true
+      });
       expect(previous).to.deep.eq(undefined);
     });
 
     it(`triggers updaters when an entity is orphaned`, () => {
       cache.write(activeUsersQuery, {
         activeUsers: [
-          { __typename: 'User', id: 2, name: 'Munster', active: true },
-        ],
+          { __typename: 'User', id: 2, name: 'Munster', active: true }
+        ]
       });
 
       expect(userUpdater.mock.calls.length).to.eq(1);
       const [, user, previous] = userUpdater.mock.calls[0];
       expect(user).to.eq(undefined);
-      expect(previous).to.deep.eq({ __typename: 'User', id: 1, name: 'Gouda', active: true });
+      expect(previous).to.deep.eq({
+        __typename: 'User',
+        id: 1,
+        name: 'Gouda',
+        active: true
+      });
     });
 
     it(`respects writes by updaters`, () => {
-      cache.write({ ...getUserQuery, variables: { id: 2 } }, {
-        user: { __typename: 'User', id: 2, name: 'Munster', active: false },
-      });
+      cache.write(
+        { ...getUserQuery, variables: { id: 2 } },
+        {
+          user: { __typename: 'User', id: 2, name: 'Munster', active: false }
+        }
+      );
 
       expect(cache.read(activeUsersQuery).result).to.deep.eq({
         activeUsers: [
-          { __typename: 'User', id: 1, name: 'Gouda', active: true },
-        ],
+          { __typename: 'User', id: 1, name: 'Gouda', active: true }
+        ]
       });
     });
 
@@ -105,6 +124,5 @@ describe(`context.CacheContext`, () => {
       expect(root.foo).to.eq(123);
       expect(previous.foo).to.eq(undefined);
     });
-
   });
 });

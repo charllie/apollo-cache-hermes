@@ -17,19 +17,24 @@ describe(`operations.migrate`, () => {
           id: 'a',
           first: 'Jonh',
           last: 'Doe',
-          __typename: 'Viewer',
-        },
+          __typename: 'Viewer'
+        }
       },
       `{ foo bar viewer { id first last __typename } }`,
       cacheContext
     );
-    cacheSnapshot = new CacheSnapshot(snapshot, snapshot, new OptimisticUpdateQueue());
+    cacheSnapshot = new CacheSnapshot(
+      snapshot,
+      snapshot,
+      new OptimisticUpdateQueue()
+    );
   });
 
   it(`does nothing if no migration map is provided`, () => {
     const migrated = migrate(cacheSnapshot);
     const cacheAfter = extract(migrated.baseline, cacheContext);
-    jestExpect(cacheAfter).toEqual(extract(cacheSnapshot.baseline, cacheContext));
+    jestExpect(cacheAfter).toEqual(
+      extract(cacheSnapshot.baseline, cacheContext)
+    );
   });
-
 });

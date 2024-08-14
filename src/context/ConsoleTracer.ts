@@ -11,13 +11,12 @@ const INDENT = '  ';
  * out all cache operations.
  */
 export class ConsoleTracer implements Tracer<void> {
-
   // Used when emulating grouping behavior.
   private _indent = 0;
 
   constructor(
     private _verbose: boolean,
-    private _logger: ConsoleTracer.Logger = ConsoleTracer.DefaultLogger,
+    private _logger: ConsoleTracer.Logger = ConsoleTracer.DefaultLogger
   ) {}
 
   warning(message: string, ...metadata: any[]) {
@@ -68,7 +67,11 @@ export class ConsoleTracer implements Tracer<void> {
 
   // Internal
 
-  private _emit(level: 'debug' | 'info' | 'warn', message: string, ...metadata: any[]) {
+  private _emit(
+    level: 'debug' | 'info' | 'warn',
+    message: string,
+    ...metadata: any[]
+  ) {
     if (this._indent) {
       for (let i = 0; i < this._indent; i++) {
         message = `${INDENT}${message}`;
@@ -103,7 +106,6 @@ export class ConsoleTracer implements Tracer<void> {
       this._indent -= 1;
     }
   }
-
 }
 
 export namespace ConsoleTracer {
@@ -127,10 +129,10 @@ export namespace ConsoleTracer {
   export const DefaultLogger: Logger = {
     debug: _makeDefaultEmitter('debug'),
     info: _makeDefaultEmitter('info'),
-    warn:  _makeDefaultEmitter('warn'),
+    warn: _makeDefaultEmitter('warn'),
     // Grouping:
     group: _makeDefaultEmitter('group'),
-    groupEnd: console.groupEnd ? console.groupEnd.bind(console) : () => {},
+    groupEnd: console.groupEnd ? console.groupEnd.bind(console) : () => {}
   };
 }
 

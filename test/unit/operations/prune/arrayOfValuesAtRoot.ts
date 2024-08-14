@@ -1,6 +1,10 @@
 import { extract, prune } from '../../../../src/operations';
 import { Serializable, StaticNodeId } from '../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext, query } from '../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext,
+  query
+} from '../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
@@ -13,13 +17,13 @@ describe(`operations.prune`, () => {
         viewer: [
           {
             postal: 123,
-            name: 'Gouda',
+            name: 'Gouda'
           },
           {
             postal: 456,
-            name: 'Brie',
-          },
-        ],
+            name: 'Brie'
+          }
+        ]
       },
       `{ viewer { postal name } }`,
       cacheContext
@@ -35,13 +39,9 @@ describe(`operations.prune`, () => {
       [QueryRootId]: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         data: {
-          viewer: [
-            { name: 'Gouda' },
-            { name: 'Brie' },
-          ],
-        },
-      },
+          viewer: [{ name: 'Gouda' }, { name: 'Brie' }]
+        }
+      }
     });
   });
-
 });

@@ -11,7 +11,6 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // It just isn't very fruitful to unit test the individual steps of the write
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
   const rootValuesQuery = query(`{
@@ -26,16 +25,18 @@ describe(`operations.write`, () => {
   }`);
 
   describe(`orphans a node`, () => {
-    let baseline: GraphSnapshot, snapshot: GraphSnapshot, editedNodeIds: Set<NodeId>;
+    let baseline: GraphSnapshot,
+      snapshot: GraphSnapshot,
+      editedNodeIds: Set<NodeId>;
     beforeAll(() => {
       const baselineResult = write(context, empty, rootValuesQuery, {
         foo: { id: 1, name: 'Foo' },
-        bar: { id: 2, name: 'Bar' },
+        bar: { id: 2, name: 'Bar' }
       });
       baseline = baselineResult.snapshot;
 
       const result = write(context, baseline, query(`{ bar { id } }`), {
-        bar: null,
+        bar: null
       });
       snapshot = result.snapshot;
       editedNodeIds = result.editedNodeIds;
@@ -44,23 +45,27 @@ describe(`operations.write`, () => {
     it(`replaces the reference with null`, () => {
       jestExpect(snapshot.getNodeData(QueryRootId)).toEqual({
         foo: { id: 1, name: 'Foo' },
-        bar: null,
+        bar: null
       });
     });
 
     it(`updates outbound references`, () => {
       const queryRoot = snapshot.getNodeSnapshot(QueryRootId)!;
-      jestExpect(queryRoot.outbound).toEqual(jestExpect.arrayContaining([{ id: '1', path: ['foo'] }]));
+      jestExpect(queryRoot.outbound).toEqual(
+        jestExpect.arrayContaining([{ id: '1', path: ['foo'] }])
+      );
     });
 
     it(`marks the container and orphaned node as edited`, () => {
-      jestExpect(Array.from(editedNodeIds)).toEqual(jestExpect.arrayContaining([QueryRootId, '2']));
+      jestExpect(Array.from(editedNodeIds)).toEqual(
+        jestExpect.arrayContaining([QueryRootId, '2'])
+      );
     });
 
     it(`contains the correct nodes`, () => {
-      jestExpect(snapshot.allNodeIds()).toEqual(jestExpect.arrayContaining([QueryRootId, '1']));
+      jestExpect(snapshot.allNodeIds()).toEqual(
+        jestExpect.arrayContaining([QueryRootId, '1'])
+      );
     });
-
   });
-
 });

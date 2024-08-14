@@ -6,7 +6,6 @@ import { getOperationOrDie } from '../../../src/util';
 import { strictConfig } from '../../helpers';
 
 describe(`parseQuery with static queries`, () => {
-
   const context = new CacheContext(strictConfig);
   function parseOperation(operationString: string) {
     const operation = getOperationOrDie(gql(operationString));
@@ -16,9 +15,9 @@ describe(`parseQuery with static queries`, () => {
   it(`parses single-field queries`, () => {
     expect(parseOperation(`{ foo }`)).to.deep.eq({
       parsedQuery: {
-        foo: new ParsedQueryNode(),
+        foo: new ParsedQueryNode()
       },
-      variables: new Set(),
+      variables: new Set()
     });
   });
 
@@ -33,23 +32,23 @@ describe(`parseQuery with static queries`, () => {
       parsedQuery: {
         foo: new ParsedQueryNode({
           bar: new ParsedQueryNode({
-            fizz: new ParsedQueryNode(),
+            fizz: new ParsedQueryNode()
           }),
           baz: new ParsedQueryNode({
-            buzz: new ParsedQueryNode(),
-          }),
-        }),
+            buzz: new ParsedQueryNode()
+          })
+        })
       },
-      variables: new Set(),
+      variables: new Set()
     });
   });
 
   it(`includes a schemaName when a field is aliased`, () => {
     expect(parseOperation(`{ foo: bar }`)).to.deep.eq({
       parsedQuery: {
-        foo: new ParsedQueryNode(undefined, 'bar'),
+        foo: new ParsedQueryNode(undefined, 'bar')
       },
-      variables: new Set(),
+      variables: new Set()
     });
   });
 
@@ -63,10 +62,9 @@ describe(`parseQuery with static queries`, () => {
       parsedQuery: {
         foo: new ParsedQueryNode(undefined, 'fizz'),
         bar: new ParsedQueryNode(undefined, 'fizz'),
-        fizz: new ParsedQueryNode(),
+        fizz: new ParsedQueryNode()
       },
-      variables: new Set(),
+      variables: new Set()
     });
   });
-
 });

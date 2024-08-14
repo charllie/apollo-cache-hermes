@@ -9,7 +9,7 @@ describe(`context.CacheContext`, () => {
     function transformDocument(context: CacheContext, operation: string) {
       return context.parseOperation({
         rootId: 'abc',
-        document: context.transformDocument(gql(operation)),
+        document: context.transformDocument(gql(operation))
       });
     }
 
@@ -24,11 +24,14 @@ describe(`context.CacheContext`, () => {
 
     it(`does not inject __typename by default`, () => {
       const context = new CacheContext(strictConfig);
-      const parsed = transformDocument(context, `{
+      const parsed = transformDocument(
+        context,
+        `{
         foo {
           bar { a b }
         }
-      }`);
+      }`
+      );
 
       expect(context.addTypename).to.eq(false);
 
@@ -38,17 +41,22 @@ describe(`context.CacheContext`, () => {
       const fooSelection = (rootSelection.selections[0] as any).selectionSet;
       expect(fieldNames(fooSelection)).to.have.members(['bar']);
 
-      const barSelection = fooSelection.selections.find((s: any) => s.name.value === 'bar').selectionSet;
+      const barSelection = fooSelection.selections.find(
+        (s: any) => s.name.value === 'bar'
+      ).selectionSet;
       expect(fieldNames(barSelection)).to.have.members(['a', 'b']);
     });
 
     it(`injects __typename into parsed queries`, () => {
       const context = new CacheContext({ ...strictConfig, addTypename: true });
-      const parsed = transformDocument(context, `{
+      const parsed = transformDocument(
+        context,
+        `{
         foo {
           bar { a b }
         }
-      }`);
+      }`
+      );
 
       expect(context.addTypename).to.eq(true);
 
@@ -58,13 +66,21 @@ describe(`context.CacheContext`, () => {
       const fooSelection = (rootSelection.selections[0] as any).selectionSet;
       expect(fieldNames(fooSelection)).to.have.members(['__typename', 'bar']);
 
-      const barSelection = fooSelection.selections.find((s: any) => s.name.value === 'bar').selectionSet;
-      expect(fieldNames(barSelection)).to.have.members(['__typename', 'a', 'b']);
+      const barSelection = fooSelection.selections.find(
+        (s: any) => s.name.value === 'bar'
+      ).selectionSet;
+      expect(fieldNames(barSelection)).to.have.members([
+        '__typename',
+        'a',
+        'b'
+      ]);
     });
 
     it(`injects __typename into fragments`, () => {
       const context = new CacheContext({ ...strictConfig, addTypename: true });
-      const parsed = transformDocument(context, `
+      const parsed = transformDocument(
+        context,
+        `
         query stuff {
           foo {
             __typename
@@ -73,7 +89,8 @@ describe(`context.CacheContext`, () => {
         }
 
         fragment fullFoo on Foo { bar }
-      `);
+      `
+      );
 
       const rootSelection = parsed.info.operation.selectionSet;
       expect(fieldNames(rootSelection)).to.have.members(['foo']);
@@ -82,17 +99,23 @@ describe(`context.CacheContext`, () => {
       expect(fieldNames(fooSelection)).to.have.members(['__typename']);
 
       const fullFooSelection = parsed.info.fragmentMap['fullFoo'].selectionSet;
-      expect(fieldNames(fullFooSelection)).to.have.members(['__typename', 'bar']);
+      expect(fieldNames(fullFooSelection)).to.have.members([
+        '__typename',
+        'bar'
+      ]);
     });
 
     it(`injects __typename into inline fragments`, () => {
       const context = new CacheContext({ ...silentConfig, addTypename: true });
-      const parsed = transformDocument(context, `{
+      const parsed = transformDocument(
+        context,
+        `{
         asdf {
         ... on Foo { a }
         ... on Bar { b }
           }
-      }`);
+      }`
+      );
 
       const rootSelection = parsed.info.operation.selectionSet;
       expect(fieldNames(rootSelection)).to.have.members(['asdf']);

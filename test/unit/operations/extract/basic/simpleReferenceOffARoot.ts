@@ -1,12 +1,14 @@
 import { extract } from '../../../../../src/operations/extract';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`simple references hanging off a root`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
@@ -14,9 +16,9 @@ describe(`operations.extract`, () => {
         {
           viewer: {
             id: 123,
-            name: 'Gouda',
+            name: 'Gouda'
           },
-          justValue: '42',
+          justValue: '42'
         },
         `{
           viewer {
@@ -38,16 +40,15 @@ describe(`operations.extract`, () => {
           outbound: [{ id: '123', path: ['viewer'] }],
           data: {
             justValue: '42',
-            viewer: undefined,
-          },
+            viewer: undefined
+          }
         },
         '123': {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: QueryRootId, path: ['viewer'] }],
-          data: { id: 123, name: 'Gouda' },
-        },
+          data: { id: 123, name: 'Gouda' }
+        }
       });
     });
-
   });
 });

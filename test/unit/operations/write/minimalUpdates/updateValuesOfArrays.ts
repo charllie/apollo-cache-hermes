@@ -11,18 +11,22 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // It just isn't very fruitful to unit test the individual steps of the write
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
   const basicQuery = query(`{ foo }`);
 
   describe(`minimal updates values of arrays`, () => {
-
     it(`preserves scalar arrays if none of their values change`, () => {
-      const { snapshot: baseSnapshot } = write(context, empty, basicQuery, { foo: [1, 2, 3] });
-      const { snapshot } = write(context, baseSnapshot, basicQuery, { foo: [1, 2, 3] });
+      const { snapshot: baseSnapshot } = write(context, empty, basicQuery, {
+        foo: [1, 2, 3]
+      });
+      const { snapshot } = write(context, baseSnapshot, basicQuery, {
+        foo: [1, 2, 3]
+      });
 
-      jestExpect(snapshot.getNodeData(QueryRootId)).toBe(baseSnapshot.getNodeData(QueryRootId));
+      jestExpect(snapshot.getNodeData(QueryRootId)).toBe(
+        baseSnapshot.getNodeData(QueryRootId)
+      );
     });
 
     it(`preserves complex arrays if none of their values change`, () => {
@@ -30,13 +34,15 @@ describe(`operations.write`, () => {
       const value2 = { nested: { value: 2 } };
       const value3 = { nested: { value: 3 } };
       const { snapshot: baseSnapshot } = write(context, empty, basicQuery, {
-        foo: [value1, value2, value3],
+        foo: [value1, value2, value3]
       });
       const { snapshot } = write(context, baseSnapshot, basicQuery, {
-        foo: [value1, value2, value3],
+        foo: [value1, value2, value3]
       });
 
-      jestExpect(snapshot.getNodeData(QueryRootId)).toBe(baseSnapshot.getNodeData(QueryRootId));
+      jestExpect(snapshot.getNodeData(QueryRootId)).toBe(
+        baseSnapshot.getNodeData(QueryRootId)
+      );
     });
 
     it(`only edits values that do change`, () => {
@@ -45,10 +51,10 @@ describe(`operations.write`, () => {
       const value3 = { nested: { value: 3 } };
       const value4 = { nested: { value: 4 } };
       const { snapshot: baseSnapshot } = write(context, empty, basicQuery, {
-        foo: [value1, value2, value3],
+        foo: [value1, value2, value3]
       });
       const { snapshot } = write(context, baseSnapshot, basicQuery, {
-        foo: [value1, value4, value3],
+        foo: [value1, value4, value3]
       });
 
       const baseValue = baseSnapshot.getNodeData(QueryRootId).foo;
@@ -58,7 +64,5 @@ describe(`operations.write`, () => {
       jestExpect(newValue[1]).toEqual({ nested: { value: 4 } });
       jestExpect(baseValue[1]).toEqual({ nested: { value: 2 } });
     });
-
   });
-
 });

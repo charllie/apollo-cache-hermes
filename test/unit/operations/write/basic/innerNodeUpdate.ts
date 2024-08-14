@@ -8,13 +8,12 @@ import { createSnapshot, updateSnapshot } from '../../../../helpers';
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
   describe(`inner nodes update`, () => {
-
     let snapshot: GraphSnapshot, editedNodeIds: Set<NodeId>;
     beforeAll(() => {
       const baseline = createSnapshot(
         {
           foo: { id: 1, name: 'Foo' },
-          bar: { id: 2, name: 'Bar' },
+          bar: { id: 2, name: 'Bar' }
         },
         `{
           foo {
@@ -28,11 +27,12 @@ describe(`operations.write`, () => {
         }`
       ).snapshot;
 
-      const result = updateSnapshot(baseline,
+      const result = updateSnapshot(
+        baseline,
         {
           id: 1,
           name: 'moo',
-          extra: true,
+          extra: true
         },
         `{ id name extra }`,
         /* gqlVariables */ undefined,
@@ -43,13 +43,17 @@ describe(`operations.write`, () => {
     });
 
     it(`edits the inner node`, () => {
-      jestExpect(snapshot.getNodeData('1')).toEqual({ id: 1, name: 'moo', extra: true });
+      jestExpect(snapshot.getNodeData('1')).toEqual({
+        id: 1,
+        name: 'moo',
+        extra: true
+      });
     });
 
     it(`marks only the inner node as edited`, () => {
-      jestExpect(Array.from(editedNodeIds)).toEqual(jestExpect.arrayContaining(['1']));
+      jestExpect(Array.from(editedNodeIds)).toEqual(
+        jestExpect.arrayContaining(['1'])
+      );
     });
-
   });
-
 });

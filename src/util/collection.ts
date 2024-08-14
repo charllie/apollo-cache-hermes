@@ -39,7 +39,7 @@ export function lazyImmutableDeepSet<TEntity>(
   target: TEntity | undefined,
   original: TEntity | undefined,
   path: PathPart[],
-  value: any,
+  value: any
 ): TEntity {
   if (!path.length) return value;
 
@@ -57,7 +57,9 @@ export function lazyImmutableDeepSet<TEntity>(
       } else if (typeof key === 'string') {
         targetNode = originalNode ? { ...originalNode } : {};
       } else {
-        throw new Error(`Unknown path type ${JSON.stringify(key)} in path ${JSON.stringify(path)} at index ${i}`);
+        throw new Error(
+          `Unknown path type ${JSON.stringify(key)} in path ${JSON.stringify(path)} at index ${i}`
+        );
       }
 
       if (i === 0) {
@@ -81,9 +83,13 @@ export function lazyImmutableDeepSet<TEntity>(
   return target as TEntity;
 }
 
-export function setsHaveSomeIntersection<TValue>(left: Set<TValue>, right: Set<TValue>) {
+export function setsHaveSomeIntersection<TValue>(
+  left: Set<TValue>,
+  right: Set<TValue>
+) {
   // Walk the smaller set.
-  const [toIterate, toCheck] = left.size > right.size ? [right, left] : [left, right];
+  const [toIterate, toCheck] =
+    left.size > right.size ? [right, left] : [left, right];
 
   for (const value of toIterate) {
     if (toCheck.has(value)) return true;

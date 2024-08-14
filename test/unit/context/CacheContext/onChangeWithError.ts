@@ -20,29 +20,25 @@ describe(`context.CacheContext`, () => {
         info: jest.fn(),
         warn: jest.fn(),
         group: jest.fn(),
-        groupEnd: jest.fn(),
+        groupEnd: jest.fn()
       },
-      onChange: mockOnChange,
+      onChange: mockOnChange
     });
 
     it(`do not trigger onChange callback on error`, () => {
-      cache.transaction((transaction) => {
-        transaction.write(
-          graphqlQuery,
-          {
-            foo: {
-              id: 0,
-              bar: {
-                id: 1,
-                name: 'Gouda',
-              },
-            },
+      cache.transaction(transaction => {
+        transaction.write(graphqlQuery, {
+          foo: {
+            id: 0,
+            bar: {
+              id: 1,
+              name: 'Gouda'
+            }
           }
-        );
+        });
         throw new Error(`Fake error`);
       });
       expect(mockOnChange.mock.calls.length).to.equal(0);
     });
-
   });
 });

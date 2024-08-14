@@ -1,12 +1,14 @@
 import { extract } from '../../../../../src/operations/extract';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`2d array of references hanging off of a root`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
@@ -15,14 +17,10 @@ describe(`operations.extract`, () => {
           rows: [
             [
               { id: 'a', value: 1 },
-              { id: 'b', value: 2 },
+              { id: 'b', value: 2 }
             ],
-            [
-              { id: 'c', value: 3 },
-              { id: 'd', value: 4 },
-              null,
-            ],
-          ],
+            [{ id: 'c', value: 3 }, { id: 'd', value: 4 }, null]
+          ]
         },
         `{ 
           rows {
@@ -44,45 +42,36 @@ describe(`operations.extract`, () => {
             { id: 'a', path: ['rows', 0, 0] },
             { id: 'b', path: ['rows', 0, 1] },
             { id: 'c', path: ['rows', 1, 0] },
-            { id: 'd', path: ['rows', 1, 1] },
+            { id: 'd', path: ['rows', 1, 1] }
           ],
           data: {
             rows: [
-              [
-                undefined,
-                undefined,
-              ],
-              [
-                undefined,
-                undefined,
-                null,
-              ],
-            ],
-          },
+              [undefined, undefined],
+              [undefined, undefined, null]
+            ]
+          }
         },
-        'a': {
+        a: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: QueryRootId, path: ['rows', 0, 0] }],
-          data: { id: 'a', value: 1 },
+          data: { id: 'a', value: 1 }
         },
-        'b': {
+        b: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: QueryRootId, path: ['rows', 0, 1] }],
-          data: { id: 'b', value: 2 },
+          data: { id: 'b', value: 2 }
         },
-        'c': {
+        c: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: QueryRootId, path: ['rows', 1, 0] }],
-          data: { id: 'c', value: 3 },
+          data: { id: 'c', value: 3 }
         },
-        'd': {
+        d: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: QueryRootId, path: ['rows', 1, 1] }],
-          data: { id: 'd', value: 4 },
-        },
-
+          data: { id: 'd', value: 4 }
+        }
       });
     });
-
   });
 });

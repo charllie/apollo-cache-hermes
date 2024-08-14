@@ -4,13 +4,12 @@ import { Hermes } from '../../../../src/apollo/Hermes';
 import { CacheContext } from '../../../../src/context/CacheContext';
 import { GraphSnapshot } from '../../../../src/GraphSnapshot';
 import { EntitySnapshot } from '../../../../src/nodes/EntitySnapshot';
-import { StaticNodeId, Serializable } from '../../../../src/schema';
+import { Serializable, StaticNodeId } from '../../../../src/schema';
 import { strictConfig } from '../../../helpers/context';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`writeFragment with simple reference`, () => {
-
   let hermes: Hermes, baseline: GraphSnapshot;
   beforeAll(() => {
     hermes = new Hermes(new CacheContext(strictConfig));
@@ -19,14 +18,14 @@ describe(`writeFragment with simple reference`, () => {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         outbound: [{ id: '123', path: ['viewer'] }],
         data: {
-          justValue: '42',
-        },
+          justValue: '42'
+        }
       },
       '123': {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         inbound: [{ id: QueryRootId, path: ['viewer'] }],
-        data: { id: 123, name: 'Gouda', __typename: 'Viewer' },
-      },
+        data: { id: 123, name: 'Gouda', __typename: 'Viewer' }
+      }
     });
 
     hermes.writeFragment({
@@ -46,13 +45,13 @@ describe(`writeFragment with simple reference`, () => {
         __typename: 'Viewer',
         notes: [
           {
-            details: 'Hello',
+            details: 'Hello'
           },
           {
-            details: 'World',
-          },
-        ],
-      },
+            details: 'World'
+          }
+        ]
+      }
     });
     baseline = hermes.getCurrentCacheSnapshot().baseline;
   });
@@ -64,12 +63,12 @@ describe(`writeFragment with simple reference`, () => {
       __typename: 'Viewer',
       notes: [
         {
-          details: 'Hello',
+          details: 'Hello'
         },
         {
-          details: 'World',
-        },
-      ],
+          details: 'World'
+        }
+      ]
     });
   });
 
@@ -82,17 +81,18 @@ describe(`writeFragment with simple reference`, () => {
           __typename: 'Viewer',
           notes: [
             {
-              details: 'Hello',
+              details: 'Hello'
             },
             {
-              details: 'World',
-            },
-          ],
+              details: 'World'
+            }
+          ]
         },
-        [{ id: QueryRootId, path: ['viewer'] }],
+        [{ id: QueryRootId, path: ['viewer'] }]
       )
     );
-    expect(baseline.getNodeData(QueryRootId)!['viewer']).to.eq(baseline.getNodeData('123'));
+    expect(baseline.getNodeData(QueryRootId)!['viewer']).to.eq(
+      baseline.getNodeData('123')
+    );
   });
-
 });

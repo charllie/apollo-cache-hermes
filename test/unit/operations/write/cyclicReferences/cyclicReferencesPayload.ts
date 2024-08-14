@@ -10,7 +10,6 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
   describe(`cyclic references payload`, () => {
-
     let snapshot: GraphSnapshot, editedNodeIds: Set<NodeId>;
     beforeAll(() => {
       const cyclicRefQuery = `{
@@ -35,9 +34,9 @@ describe(`operations.write`, () => {
               id: 2,
               name: 'Bar',
               fizz: { id: 1 },
-              buzz: { id: 2 },
-            },
-          },
+              buzz: { id: 2 }
+            }
+          }
         },
         cyclicRefQuery
       );
@@ -61,11 +60,15 @@ describe(`operations.write`, () => {
     });
 
     it(`properly references the cyclic nodes via QueryRoot`, () => {
-      jestExpect(snapshot.getNodeData(QueryRootId).foo).toBe(snapshot.getNodeData('1'));
+      jestExpect(snapshot.getNodeData(QueryRootId).foo).toBe(
+        snapshot.getNodeData('1')
+      );
     });
 
     it(`marks all the nodes as edited`, () => {
-      jestExpect(Array.from(editedNodeIds)).toEqual(jestExpect.arrayContaining([QueryRootId, '1', '2']));
+      jestExpect(Array.from(editedNodeIds)).toEqual(
+        jestExpect.arrayContaining([QueryRootId, '1', '2'])
+      );
     });
   });
 });

@@ -1,13 +1,15 @@
 import { extract } from '../../../../../src/operations/extract';
 import { nodeIdForParameterizedValue } from '../../../../../src/operations/SnapshotEditor';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`nested parameterized value`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
@@ -18,10 +20,10 @@ describe(`operations.extract`, () => {
               bee: 'BEEZ',
               three: {
                 name: 'ThreeName',
-                extraValue: 42,
-              },
-            },
-          },
+                extraValue: 42
+              }
+            }
+          }
         },
         `query getAFoo($id: ID!) {
           one {
@@ -54,21 +56,20 @@ describe(`operations.extract`, () => {
           data: {
             one: {
               two: {
-                bee: 'BEEZ',
-              },
-            },
-          },
+                bee: 'BEEZ'
+              }
+            }
+          }
         },
         [parameterizedId]: {
           type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
           inbound: [{ id: QueryRootId, path: ['one', 'two', 'three'] }],
           data: {
             name: 'ThreeName',
-            extraValue: 42,
-          },
-        },
+            extraValue: 42
+          }
+        }
       });
     });
-
   });
 });

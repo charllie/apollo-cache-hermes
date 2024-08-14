@@ -1,6 +1,10 @@
 import { CacheContext } from '../context/CacheContext';
 import { GraphSnapshot } from '../GraphSnapshot';
-import { EntitySnapshot, NodeSnapshot, ParameterizedValueSnapshot } from '../nodes';
+import {
+  EntitySnapshot,
+  NodeSnapshot,
+  ParameterizedValueSnapshot
+} from '../nodes';
 import { JsonValue, NestedValue } from '../primitive';
 import { isSerializable, Serializable } from '../schema';
 import { lazyImmutableDeepSet, referenceValues } from '../util';
@@ -14,7 +18,10 @@ import { lazyImmutableDeepSet, referenceValues } from '../util';
  *
  * @throws Will throw an error if there is no corresponding node type
  */
-export function extract(graphSnapshot: GraphSnapshot, cacheContext: CacheContext): Serializable.GraphSnapshot {
+export function extract(
+  graphSnapshot: GraphSnapshot,
+  cacheContext: CacheContext
+): Serializable.GraphSnapshot {
   const result: Serializable.GraphSnapshot = {};
   const entities = graphSnapshot._values;
   // We don't need to check for hasOwnProperty because data._values is
@@ -29,7 +36,9 @@ export function extract(graphSnapshot: GraphSnapshot, cacheContext: CacheContext
     } else if (nodeSnapshot instanceof ParameterizedValueSnapshot) {
       type = Serializable.NodeSnapshotType.ParameterizedValueSnapshot;
     } else {
-      throw new Error(`${nodeSnapshot.constructor.name} does not have corresponding enum value in Serializable.NodeSnapshotType`);
+      throw new Error(
+        `${nodeSnapshot.constructor.name} does not have corresponding enum value in Serializable.NodeSnapshotType`
+      );
     }
 
     const serializedEntity: Serializable.NodeSnapshot = { type };
@@ -48,11 +57,19 @@ export function extract(graphSnapshot: GraphSnapshot, cacheContext: CacheContext
       if (cacheContext.tracer.warning) {
         try {
           if (!isSerializable(extractedData, /* allowUndefined */ true)) {
-            cacheContext.tracer.warning(`Data at entityID ${id} is unserializable`);
+            cacheContext.tracer.warning(
+              `Data at entityID ${id} is unserializable`
+            );
           }
         } catch (error) {
-          cacheContext.tracer.warning(`Data at entityID ${id} is unserializable because of stack overflow`);
-          cacheContext.tracer.warning(error);
+          cacheContext.tracer.warning(
+            `Data at entityID ${id} is unserializable because of stack overflow`
+          );
+          if (error instanceof Error) {
+            cacheContext.tracer.warning(error.toString());
+          } else {
+            cacheContext.tracer.warning('unknown error');
+          }
         }
       }
       serializedEntity.data = extractedData;
@@ -64,7 +81,10 @@ export function extract(graphSnapshot: GraphSnapshot, cacheContext: CacheContext
   return result;
 }
 
-function extractSerializableData(graphSnapshot: GraphSnapshot, nodeSnapshot: NodeSnapshot): NestedValue<JsonValue | undefined> {
+function extractSerializableData(
+  graphSnapshot: GraphSnapshot,
+  nodeSnapshot: NodeSnapshot
+): NestedValue<JsonValue | undefined> {
   // If there is no outbound, then data is a value
   // 'data' can also be undefined or null even though there exist an
   // outbound reference (e.g referencing ParameterizedValueSnapshot).
@@ -89,7 +109,12 @@ function extractSerializableData(graphSnapshot: GraphSnapshot, nodeSnapshot: Nod
       // In the case of parameterized field hanging off of a root
       // the data at the ROOTQUERY node will be undefined with outbound
       // reference to the parameterized node.
-      extractedData = lazyImmutableDeepSet(extractedData, nodeSnapshot.data, outbound.path, outbound.path.length === 0 ? null : undefined);
+      extractedData = lazyImmutableDeepSet(
+        extractedData,
+        nodeSnapshot.data,
+        outbound.path,
+        outbound.path.length === 0 ? null : undefined
+      );
     }
   }
 

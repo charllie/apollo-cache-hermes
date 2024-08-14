@@ -14,13 +14,8 @@ export function createGraphSnapshot(
   gqlString: string,
   cacheContext: CacheContext,
   gqlVariables?: JsonObject,
-  rootId?: NodeId,
+  rootId?: NodeId
 ): GraphSnapshot {
-  return createSnapshot(
-    payload,
-    gqlString,
-    gqlVariables,
-    rootId,
-    cacheContext
-  ).snapshot;
+  return createSnapshot(payload, gqlString, gqlVariables, rootId, cacheContext)
+    .snapshot;
 }

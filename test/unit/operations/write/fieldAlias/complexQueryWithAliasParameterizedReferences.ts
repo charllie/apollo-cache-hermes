@@ -12,12 +12,10 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // It just isn't very fruitful to unit test the individual steps of the write
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
 
   describe(`complex query with alias parameterized references`, () => {
-
     let snapshot: GraphSnapshot;
     beforeAll(() => {
       const aliasQuery = query(`{
@@ -52,39 +50,42 @@ describe(`operations.write`, () => {
           contact: {
             shortAddress: {
               city: 'ABA',
-              state: 'AA',
+              state: 'AA'
             },
-            phone: '555-555-5555',
-          },
+            phone: '555-555-5555'
+          }
         },
         shortUser: {
           id: 4,
           FirstName: 'Foo',
           contact: {
-            phone: '555-555-5555',
-          },
+            phone: '555-555-5555'
+          }
         },
         user: {
           id: 4,
-          name: 'Foo',
-        },
+          name: 'Foo'
+        }
       }).snapshot;
     });
 
     it(`only writes fields from the schema`, () => {
-      const parameterizedId = nodeIdForParameterizedValue(QueryRootId, ['user'], { id: 4 });
+      const parameterizedId = nodeIdForParameterizedValue(
+        QueryRootId,
+        ['user'],
+        { id: 4 }
+      );
       jestExpect(snapshot.getNodeData(parameterizedId)).toEqual({
         id: 4,
         name: 'Foo',
         contactInfo: {
           address: {
             city: 'ABA',
-            state: 'AA',
+            state: 'AA'
           },
-          phone: '555-555-5555',
-        },
+          phone: '555-555-5555'
+        }
       });
     });
-
   });
 });

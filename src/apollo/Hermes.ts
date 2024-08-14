@@ -1,6 +1,4 @@
-import {
-  ApolloCache, Cache as CacheInterface, Transaction,
-} from '@apollo/client/core';
+import { Cache as CacheInterface, Transaction } from '@apollo/client/core';
 
 import { Cache, MigrationMap } from '../Cache';
 import { CacheSnapshot } from '../CacheSnapshot';
@@ -24,15 +22,26 @@ export class Hermes extends ApolloQueryable<GraphSnapshot> {
   }
 
   // TODO (yuisu): data can be typed better with update of ApolloCache API
-  restore(data: any, migrationMap?: MigrationMap, verifyOptions?: CacheInterface.ReadOptions): ApolloCache<GraphSnapshot> {
-    const verifyQuery = verifyOptions && buildRawOperationFromQuery(verifyOptions.query, verifyOptions.variables);
+  restore(
+    data: any,
+    migrationMap?: MigrationMap,
+    verifyOptions?: CacheInterface.ReadOptions
+  ): Hermes {
+    const verifyQuery =
+      verifyOptions &&
+      buildRawOperationFromQuery(verifyOptions.query, verifyOptions.variables);
     this._queryable.restore(data, migrationMap, verifyQuery);
     return this;
   }
 
   // TODO (yuisu): return can be typed better with update of ApolloCache API
-  extract(optimistic: boolean = false, pruneOptions?: CacheInterface.ReadOptions): any {
-    const pruneQuery = pruneOptions && buildRawOperationFromQuery(pruneOptions.query, pruneOptions.variables);
+  extract(
+    optimistic: boolean = false,
+    pruneOptions?: CacheInterface.ReadOptions
+  ): any {
+    const pruneQuery =
+      pruneOptions &&
+      buildRawOperationFromQuery(pruneOptions.query, pruneOptions.variables);
     return this._queryable.extract(optimistic, pruneQuery);
   }
 
@@ -48,12 +57,15 @@ export class Hermes extends ApolloQueryable<GraphSnapshot> {
     this._queryable.transaction(t => transaction(new ApolloTransaction(t)));
   }
 
-  recordOptimisticTransaction(transaction: Transaction<GraphSnapshot>, id: string): void {
+  recordOptimisticTransaction(
+    transaction: Transaction<GraphSnapshot>,
+    id: string
+  ): void {
     this._queryable.transaction(id, t => transaction(new ApolloTransaction(t)));
   }
 
   watch(options: CacheInterface.WatchOptions): () => void {
-    const query = buildRawOperationFromQuery(options.query, options.variables, options.rootId);
+    const query = buildRawOperationFromQuery(options.query, options.variables);
     return this._queryable.watch(query, options.callback);
   }
 

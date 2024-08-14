@@ -11,7 +11,6 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // It just isn't very fruitful to unit test the individual steps of the write
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
   const entityQuery = query(`{
@@ -30,17 +29,19 @@ describe(`operations.write`, () => {
   }`);
 
   describe(`reference swaps`, () => {
-    let baseline: GraphSnapshot, snapshot: GraphSnapshot, editedNodeIds: Set<NodeId>;
+    let baseline: GraphSnapshot,
+      snapshot: GraphSnapshot,
+      editedNodeIds: Set<NodeId>;
     beforeAll(() => {
       const baselineResult = write(context, empty, entityQuery, {
         foo: { id: 1, name: 'Foo' },
-        bar: { id: 2, name: 'Bar' },
+        bar: { id: 2, name: 'Bar' }
       });
       baseline = baselineResult.snapshot;
 
       const result = write(context, baseline, entityIdQuery, {
         foo: { id: 2 },
-        bar: { id: 1 },
+        bar: { id: 1 }
       });
       snapshot = result.snapshot;
       editedNodeIds = result.editedNodeIds;
@@ -49,7 +50,7 @@ describe(`operations.write`, () => {
     it(`previous versions still have original value`, () => {
       jestExpect(baseline.getNodeData(QueryRootId)).toEqual({
         foo: { id: 1, name: 'Foo' },
-        bar: { id: 2, name: 'Bar' },
+        bar: { id: 2, name: 'Bar' }
       });
     });
 
@@ -60,26 +61,36 @@ describe(`operations.write`, () => {
 
     it(`updates outbound references`, () => {
       const queryRoot = snapshot.getNodeSnapshot(QueryRootId)!;
-      jestExpect(queryRoot.outbound).toEqual(jestExpect.arrayContaining([
-        { id: '2', path: ['foo'] },
-        { id: '1', path: ['bar'] },
-      ]));
+      jestExpect(queryRoot.outbound).toEqual(
+        jestExpect.arrayContaining([
+          { id: '2', path: ['foo'] },
+          { id: '1', path: ['bar'] }
+        ])
+      );
       jestExpect(queryRoot.inbound).toBe(undefined);
     });
 
     it(`updates inbound references`, () => {
       const foo = snapshot.getNodeSnapshot('1')!;
       const bar = snapshot.getNodeSnapshot('2')!;
-      jestExpect(foo.inbound).toEqual(jestExpect.arrayContaining([{ id: QueryRootId, path: ['bar'] }]));
-      jestExpect(bar.inbound).toEqual(jestExpect.arrayContaining([{ id: QueryRootId, path: ['foo'] }]));
+      jestExpect(foo.inbound).toEqual(
+        jestExpect.arrayContaining([{ id: QueryRootId, path: ['bar'] }])
+      );
+      jestExpect(bar.inbound).toEqual(
+        jestExpect.arrayContaining([{ id: QueryRootId, path: ['foo'] }])
+      );
     });
 
     it(`marks the container as edited`, () => {
-      jestExpect(Array.from(editedNodeIds)).toEqual(jestExpect.arrayContaining([QueryRootId]));
+      jestExpect(Array.from(editedNodeIds)).toEqual(
+        jestExpect.arrayContaining([QueryRootId])
+      );
     });
 
     it(`contains the correct nodes`, () => {
-      jestExpect(snapshot.allNodeIds()).toEqual(jestExpect.arrayContaining([QueryRootId, '1', '2']));
+      jestExpect(snapshot.allNodeIds()).toEqual(
+        jestExpect.arrayContaining([QueryRootId, '1', '2'])
+      );
     });
   });
 });

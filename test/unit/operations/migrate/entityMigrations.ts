@@ -17,8 +17,8 @@ function createNewCacheSnapshot(cacheContext: CacheContext) {
         id: 'a',
         first: 'Jonh',
         last: 'Doe',
-        __typename: 'Viewer',
-      },
+        __typename: 'Viewer'
+      }
     },
     `{ foo bar viewer { id first last __typename } }`,
     cacheContext
@@ -37,9 +37,9 @@ describe(`operations.migrate`, () => {
     const migrated = migrate(createNewCacheSnapshot(cacheContext), {
       _entities: {
         Query: {
-          extra: (_previous: JsonValue) => '',
-        },
-      },
+          extra: (_previous: JsonValue) => ''
+        }
+      }
     });
     const cacheAfter = extract(migrated.baseline, cacheContext);
     jestExpect(cacheAfter).toEqual({
@@ -49,22 +49,25 @@ describe(`operations.migrate`, () => {
           foo: 123,
           bar: 'asdf',
           extra: '',
-          'viewer': undefined,
+          viewer: undefined
         },
-        outbound: [{
-          id: 'a', path: ['viewer'],
-        }],
+        outbound: [
+          {
+            id: 'a',
+            path: ['viewer']
+          }
+        ]
       },
-      'a': {
+      a: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         data: {
           id: 'a',
           first: 'Jonh',
           last: 'Doe',
-          __typename: 'Viewer',
+          __typename: 'Viewer'
         },
-        inbound: [{ id: QueryRootId, path: ['viewer'] }],
-      },
+        inbound: [{ id: QueryRootId, path: ['viewer'] }]
+      }
     });
   });
 
@@ -73,9 +76,9 @@ describe(`operations.migrate`, () => {
       _entities: {
         Query: {
           foo: (_previous: JsonValue) => 456,
-          bar: (_previous: JsonValue) => 'woohoo',
-        },
-      },
+          bar: (_previous: JsonValue) => 'woohoo'
+        }
+      }
     });
     const cacheAfter = extract(migrated.baseline, cacheContext);
     jestExpect(cacheAfter).toEqual({
@@ -84,22 +87,25 @@ describe(`operations.migrate`, () => {
         data: {
           foo: 456,
           bar: 'woohoo',
-          'viewer': undefined,
+          viewer: undefined
         },
-        outbound: [{
-          id: 'a', path: ['viewer'],
-        }],
+        outbound: [
+          {
+            id: 'a',
+            path: ['viewer']
+          }
+        ]
       },
-      'a': {
+      a: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         data: {
           id: 'a',
           first: 'Jonh',
           last: 'Doe',
-          __typename: 'Viewer',
+          __typename: 'Viewer'
         },
-        inbound: [{ id: QueryRootId, path: ['viewer'] }],
-      },
+        inbound: [{ id: QueryRootId, path: ['viewer'] }]
+      }
     });
   });
 
@@ -107,9 +113,9 @@ describe(`operations.migrate`, () => {
     const migrated = migrate(createNewCacheSnapshot(cacheContext), {
       _entities: {
         Viewer: {
-          suffix: (_previous: JsonValue) => 'Dr',
-        },
-      },
+          suffix: (_previous: JsonValue) => 'Dr'
+        }
+      }
     });
     const cacheAfter = extract(migrated.baseline, cacheContext);
     jestExpect(cacheAfter).toEqual({
@@ -118,23 +124,26 @@ describe(`operations.migrate`, () => {
         data: {
           foo: 123,
           bar: 'asdf',
-          'viewer': undefined,
+          viewer: undefined
         },
-        outbound: [{
-          id: 'a', path: ['viewer'],
-        }],
+        outbound: [
+          {
+            id: 'a',
+            path: ['viewer']
+          }
+        ]
       },
-      'a': {
+      a: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         data: {
           id: 'a',
           first: 'Jonh',
           last: 'Doe',
           suffix: 'Dr',
-          __typename: 'Viewer',
+          __typename: 'Viewer'
         },
-        inbound: [{ id: QueryRootId, path: ['viewer'] }],
-      },
+        inbound: [{ id: QueryRootId, path: ['viewer'] }]
+      }
     });
   });
 
@@ -143,9 +152,9 @@ describe(`operations.migrate`, () => {
       _entities: {
         Viewer: {
           first: (_previous: JsonValue) => 'Adam',
-          last: (_previous: JsonValue) => 'Smith',
-        },
-      },
+          last: (_previous: JsonValue) => 'Smith'
+        }
+      }
     });
     const cacheAfter = extract(migrated.baseline, cacheContext);
     jestExpect(cacheAfter).toEqual({
@@ -154,23 +163,25 @@ describe(`operations.migrate`, () => {
         data: {
           foo: 123,
           bar: 'asdf',
-          'viewer': undefined,
+          viewer: undefined
         },
-        outbound: [{
-          id: 'a', path: ['viewer'],
-        }],
+        outbound: [
+          {
+            id: 'a',
+            path: ['viewer']
+          }
+        ]
       },
-      'a': {
+      a: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         data: {
           id: 'a',
           first: 'Adam',
           last: 'Smith',
-          __typename: 'Viewer',
+          __typename: 'Viewer'
         },
-        inbound: [{ id: QueryRootId, path: ['viewer'] }],
-      },
+        inbound: [{ id: QueryRootId, path: ['viewer'] }]
+      }
     });
   });
-
 });

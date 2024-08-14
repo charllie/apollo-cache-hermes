@@ -13,10 +13,20 @@ export function cloneNodeSnapshot(parent: NodeSnapshot) {
   const outbound = parent.outbound ? new Map(parent.outbound) : undefined;
 
   if (parent instanceof EntitySnapshot) {
-    return new EntitySnapshot(parent.data, referenceValues(inbound), referenceValues(outbound));
+    return new EntitySnapshot(
+      parent.data,
+      referenceValues(inbound),
+      referenceValues(outbound)
+    );
   } else if (parent instanceof ParameterizedValueSnapshot) {
-    return new ParameterizedValueSnapshot(parent.data, referenceValues(inbound), referenceValues(outbound));
+    return new ParameterizedValueSnapshot(
+      parent.data,
+      referenceValues(inbound),
+      referenceValues(outbound)
+    );
   } else {
-    throw new Error(`Unknown node type: ${Object.getPrototypeOf(parent).constructor.name}`);
+    throw new Error(
+      `Unknown node type: ${Object.getPrototypeOf(parent).constructor.name}`
+    );
   }
 }

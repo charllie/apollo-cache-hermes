@@ -1,4 +1,5 @@
 // We only depend on graphql for its types; nothing at runtime.
+import { FragmentMap, getOperationDefinition } from '@apollo/client/utilities';
 import {
   ArgumentNode,
   DocumentNode,
@@ -7,9 +8,8 @@ import {
   OperationTypeNode,
   SelectionNode,
   SelectionSetNode,
-  ValueNode,
+  ValueNode
 } from 'graphql'; // eslint-disable-line import/no-extraneous-dependencies
-import { getOperationDefinition, FragmentMap } from '@apollo/client/utilities';
 import invariant from 'ts-invariant';
 
 import { JsonValue } from '../primitive';
@@ -21,16 +21,16 @@ import { valueFromNode } from './store';
 export {
   ArgumentNode,
   DocumentNode,
+  FragmentMap,
   OperationDefinitionNode,
   OperationTypeNode,
   SelectionNode,
   SelectionSetNode,
-  ValueNode,
-  FragmentMap,
+  ValueNode
 };
 
 export function getOperationOrDie(
-  document: DocumentNode,
+  document: DocumentNode
 ): OperationDefinitionNode {
   const def = getOperationDefinition(document);
   invariant(def, `GraphQL document is missing an operation`);
@@ -40,7 +40,9 @@ export function getOperationOrDie(
 /**
  * Returns the names of all variables declared by the operation.
  */
-export function variablesInOperation(operation: OperationDefinitionNode): Set<string> {
+export function variablesInOperation(
+  operation: OperationDefinitionNode
+): Set<string> {
   const names = new Set<string>();
   if (operation.variableDefinitions) {
     for (const definition of operation.variableDefinitions) {
@@ -54,14 +56,18 @@ export function variablesInOperation(operation: OperationDefinitionNode): Set<st
 /**
  * Returns the default values of all variables in the operation.
  */
-export function variableDefaultsInOperation(operation: OperationDefinitionNode): { [Key: string]: JsonValue } {
-  const defaults = {};
+export function variableDefaultsInOperation(
+  operation: OperationDefinitionNode
+): { [Key: string]: JsonValue } {
+  const defaults: Record<string, any> = {};
   if (operation.variableDefinitions) {
     for (const definition of operation.variableDefinitions) {
       if (definition.type.kind === 'NonNullType') continue; // Required.
 
       const { defaultValue } = definition;
-      defaults[definition.variable.name.value] = isObject(defaultValue) ? valueFromNode(defaultValue as ValueNode) : null;
+      defaults[definition.variable.name.value] = isObject(defaultValue)
+        ? valueFromNode(defaultValue as ValueNode)
+        : null;
     }
   }
 
@@ -92,29 +98,37 @@ export function fragmentMapForDocument(document: DocumentNode): FragmentMap {
  */
 export function selectionSetIsStatic(
   selectionSet: SelectionSetNode,
-  fragmentGetter?: (name: string) => SelectionSetNode | undefined,
+  fragmentGetter?: (name: string) => SelectionSetNode | undefined
 ): boolean {
   for (const selection of selectionSet.selections) {
     if (selection.kind === 'Field') {
       if (!fieldIsStatic(selection)) return false;
-      if (selection.selectionSet && !selectionSetIsStatic(selection.selectionSet, fragmentGetter)) return false;
-
+      if (
+        selection.selectionSet &&
+        !selectionSetIsStatic(selection.selectionSet, fragmentGetter)
+      )
+        return false;
     } else if (selection.kind === 'FragmentSpread') {
       if (!fragmentGetter) {
-        throw new Error(`fragmentGetter is required for selection sets with ...fragments`);
+        throw new Error(
+          `fragmentGetter is required for selection sets with ...fragments`
+        );
       }
       const fragmentSet = fragmentGetter(selection.name.value);
       if (!fragmentSet) {
-        throw new Error(`Unknown fragment ${selection.name.value} in isSelectionSetStatic`);
+        throw new Error(
+          `Unknown fragment ${selection.name.value} in isSelectionSetStatic`
+        );
       }
 
       if (!selectionSetIsStatic(fragmentSet, fragmentGetter)) return false;
-
     } else if (selection.kind === 'InlineFragment') {
-      if (!selectionSetIsStatic(selection.selectionSet, fragmentGetter)) return false;
-
+      if (!selectionSetIsStatic(selection.selectionSet, fragmentGetter))
+        return false;
     } else {
-      throw new Error(`Unknown selection type ${(selection as any).kind} in isSelectionSetStatic`);
+      throw new Error(
+        `Unknown selection type ${(selection as any).kind} in isSelectionSetStatic`
+      );
     }
   }
 
@@ -122,7 +136,8 @@ export function selectionSetIsStatic(
 }
 
 export function fieldIsStatic(field: FieldNode) {
-  const isActuallyStatic = !fieldHasAlias(field) && !fieldIsParameterized(field);
+  const isActuallyStatic =
+    !fieldHasAlias(field) && !fieldIsParameterized(field);
   return isActuallyStatic || fieldHasStaticDirective(field);
 }
 

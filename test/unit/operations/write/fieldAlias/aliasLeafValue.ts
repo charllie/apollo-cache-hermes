@@ -12,12 +12,10 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // It just isn't very fruitful to unit test the individual steps of the write
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
 
   describe(`alias leaf-value`, () => {
-
     let aliasQuery: RawOperation, snapshot: GraphSnapshot;
     beforeAll(() => {
       aliasQuery = query(`{
@@ -30,8 +28,8 @@ describe(`operations.write`, () => {
       snapshot = write(context, empty, aliasQuery, {
         user: {
           id: 0,
-          FirstName: 'Foo',
-        },
+          FirstName: 'Foo'
+        }
       }).snapshot;
     });
 
@@ -39,8 +37,8 @@ describe(`operations.write`, () => {
       jestExpect(snapshot.getNodeData(QueryRootId)).toEqual({
         user: {
           id: 0,
-          name: 'Foo',
-        },
+          name: 'Foo'
+        }
       });
     });
 
@@ -50,14 +48,13 @@ describe(`operations.write`, () => {
           {
             user: {
               id: 0,
-              name: 'Foo',
-            },
+              name: 'Foo'
+            }
           },
           /* inbound */ undefined,
-          /* outbound */ [{ id: '0', path: ['user'] }],
+          /* outbound */ [{ id: '0', path: ['user'] }]
         )
       );
     });
-
   });
 });

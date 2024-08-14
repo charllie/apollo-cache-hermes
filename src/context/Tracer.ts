@@ -41,7 +41,6 @@ export namespace Tracer {
  * paired handlers.
  */
 export interface Tracer<TActionContext = any> {
-
   /**
    * The cache encountered a non-fatal issue.
    */
@@ -55,17 +54,28 @@ export interface Tracer<TActionContext = any> {
   /**
    * Successful end of a request to read from the cache.
    */
-  readEnd?: (operation: OperationInstance, info: Tracer.ReadInfo, context: TActionContext) => void;
+  readEnd?: (
+    operation: OperationInstance,
+    info: Tracer.ReadInfo,
+    context: TActionContext
+  ) => void;
 
   /**
    * Start of a request to write to the cache.
    */
-  writeStart?: (rawOperation: RawOperation, payload: JsonObject) => TActionContext;
+  writeStart?: (
+    rawOperation: RawOperation,
+    payload: JsonObject
+  ) => TActionContext;
 
   /**
    * Successful end of a request to write to the cache.
    */
-  writeEnd?: (operation: OperationInstance, info: Tracer.WriteInfo, context: TActionContext) => void;
+  writeEnd?: (
+    operation: OperationInstance,
+    info: Tracer.WriteInfo,
+    context: TActionContext
+  ) => void;
 
   /**
    * Start of a transaction within the cache.
@@ -86,5 +96,4 @@ export interface Tracer<TActionContext = any> {
    * End of a request to broadcast changes to cache observers.
    */
   broadcastEnd?: (info: Tracer.BroadcastInfo, context: TActionContext) => void;
-
 }

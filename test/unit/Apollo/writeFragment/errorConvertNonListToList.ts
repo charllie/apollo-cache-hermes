@@ -5,7 +5,6 @@ import { CacheContext } from '../../../../src/context/CacheContext';
 import { strictConfig } from '../../../helpers/context';
 
 describe(`writeFragment`, () => {
-
   let hermes: Hermes;
   beforeAll(() => {
     hermes = new Hermes(new CacheContext(strictConfig));
@@ -30,10 +29,10 @@ describe(`writeFragment`, () => {
           __typename: 'Viewer',
           trucks: {
             name: 'truck0',
-            year: '1998',
-          },
-        },
-      },
+            year: '1998'
+          }
+        }
+      }
     });
   });
 
@@ -57,12 +56,11 @@ describe(`writeFragment`, () => {
             {
               name: 'truck0',
               year: '1998',
-              driverName: 'Bob',
-            },
-          ],
-        },
+              driverName: 'Bob'
+            }
+          ]
+        }
       });
     }).to.throw(/Unsupported transition from a non-list to list value/i);
   });
-
 });

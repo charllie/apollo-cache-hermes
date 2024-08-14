@@ -13,12 +13,10 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // It just isn't very fruitful to unit test the individual steps of the write
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
 
   describe(`alias parameterized field`, () => {
-
     let parameterizedId: string, snapshot: GraphSnapshot;
     beforeAll(() => {
       const aliasQuery = query(`{
@@ -31,27 +29,27 @@ describe(`operations.write`, () => {
       snapshot = write(context, empty, aliasQuery, {
         superUser: {
           ID: 0,
-          FirstName: 'Baz',
-        },
+          FirstName: 'Baz'
+        }
       }).snapshot;
 
-      parameterizedId = nodeIdForParameterizedValue(QueryRootId, ['user'], { id: 4 });
+      parameterizedId = nodeIdForParameterizedValue(QueryRootId, ['user'], {
+        id: 4
+      });
     });
 
     it(`only writes fields from the schema on simple query`, () => {
       jestExpect(snapshot.getNodeData(parameterizedId)).toEqual({
         id: 0,
-        name: 'Baz',
+        name: 'Baz'
       });
     });
 
     it(`checks shape of GraphSnapShot at root query`, () => {
       jestExpect(snapshot.getNodeSnapshot(QueryRootId)).toEqual(
-        new EntitySnapshot(
-          /* data */ undefined,
-          /* inbound */ undefined,
-          [{ id: 'ROOT_QUERY❖["user"]❖{"id":4}', path: ['user'] }],
-        )
+        new EntitySnapshot(/* data */ undefined, /* inbound */ undefined, [
+          { id: 'ROOT_QUERY❖["user"]❖{"id":4}', path: ['user'] }
+        ])
       );
     });
 
@@ -60,13 +58,12 @@ describe(`operations.write`, () => {
         new EntitySnapshot(
           {
             id: 0,
-            name: 'Baz',
+            name: 'Baz'
           },
           [{ id: 'ROOT_QUERY', path: ['user'] }],
-          /* outbound */ undefined,
+          /* outbound */ undefined
         )
       );
     });
-
   });
 });

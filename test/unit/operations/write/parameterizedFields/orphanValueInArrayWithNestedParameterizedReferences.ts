@@ -12,13 +12,13 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // It just isn't very fruitful to unit test the individual steps of the write
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
 
   describe(`orphans value in array with nested parameterized references`, () => {
-
-    let rootedQuery: RawOperation, snapshot: GraphSnapshot, entityBarId1: NodeId;
+    let rootedQuery: RawOperation,
+      snapshot: GraphSnapshot,
+      entityBarId1: NodeId;
     beforeAll(() => {
       rootedQuery = query(`{
         foo {
@@ -28,19 +28,18 @@ describe(`operations.write`, () => {
         }
       }`);
 
-      entityBarId1 = nodeIdForParameterizedValue(QueryRootId, ['foo', 1, 'bar'], { extra: true });
+      entityBarId1 = nodeIdForParameterizedValue(
+        QueryRootId,
+        ['foo', 1, 'bar'],
+        { extra: true }
+      );
 
       const { snapshot: baseSnapshot } = write(context, empty, rootedQuery, {
-        foo: [
-          { bar: { baz: { id: 1 } } },
-          { bar: { baz: { id: 2 } } },
-        ],
+        foo: [{ bar: { baz: { id: 1 } } }, { bar: { baz: { id: 2 } } }]
       });
 
       const result = write(context, baseSnapshot, rootedQuery, {
-        foo: [
-          { bar: { baz: { id: 1 } } },
-        ],
+        foo: [{ bar: { baz: { id: 1 } } }]
       });
       snapshot = result.snapshot;
     });
@@ -52,6 +51,5 @@ describe(`operations.write`, () => {
     it(`doesn't contain transitively orphaned nodes`, () => {
       jestExpect(snapshot.allNodeIds()).not.toContain('2');
     });
-
   });
 });

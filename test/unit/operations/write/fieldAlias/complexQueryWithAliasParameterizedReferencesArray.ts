@@ -12,12 +12,10 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // It just isn't very fruitful to unit test the individual steps of the write
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
 
   describe(`complex query with alias parameterized references array`, () => {
-
     let snapshot: GraphSnapshot;
     beforeAll(() => {
       const nestedAliasQuery = query(`{
@@ -41,35 +39,44 @@ describe(`operations.write`, () => {
             {
               id: 0,
               loads: [{ type: '26 Pallet' }, { type: 'Other' }],
-              shipmentSize: { weight: 1000, unit: 'lb' },
+              shipmentSize: { weight: 1000, unit: 'lb' }
             },
             {
               id: 1,
               loads: [{ type: '24 Pallet' }, { type: 'Other' }],
-              shipmentSize: { weight: 2000, unit: 'lb' },
-            },
-          ],
-        },
+              shipmentSize: { weight: 2000, unit: 'lb' }
+            }
+          ]
+        }
       }).snapshot;
     });
 
     it(`only writes fields from the schema`, () => {
-      const parameterizedId = nodeIdForParameterizedValue(QueryRootId, ['shipments'], { first: 2 });
+      const parameterizedId = nodeIdForParameterizedValue(
+        QueryRootId,
+        ['shipments'],
+        { first: 2 }
+      );
       jestExpect(snapshot.getNodeData(parameterizedId)).toEqual({
         fields: [
           {
             id: 0,
-            contents: [{ shipmentItemType: '26 Pallet' }, { shipmentItemType: 'Other' }],
-            dimensions: { weight: 1000, weightUnit: 'lb' },
+            contents: [
+              { shipmentItemType: '26 Pallet' },
+              { shipmentItemType: 'Other' }
+            ],
+            dimensions: { weight: 1000, weightUnit: 'lb' }
           },
           {
             id: 1,
-            contents: [{ shipmentItemType: '24 Pallet' }, { shipmentItemType: 'Other' }],
-            dimensions: { weight: 2000, weightUnit: 'lb' },
-          },
-        ],
+            contents: [
+              { shipmentItemType: '24 Pallet' },
+              { shipmentItemType: 'Other' }
+            ],
+            dimensions: { weight: 2000, weightUnit: 'lb' }
+          }
+        ]
       });
     });
-
   });
 });

@@ -8,7 +8,6 @@ import { nodeIdForParameterizedValue } from '../../../../src/operations/Snapshot
 import { strictConfig } from '../../../helpers/context';
 
 describe(`writeFragment with paramterized references in an array`, () => {
-
   let hermes: Hermes;
   const fragments = gql(`
     fragment shipper on Shipper {
@@ -54,7 +53,7 @@ describe(`writeFragment with paramterized references in an array`, () => {
       `),
       variables: {
         city: 'Seattle',
-        area: 'PNW',
+        area: 'PNW'
       },
       data: {
         viewer: {
@@ -67,28 +66,28 @@ describe(`writeFragment with paramterized references in an array`, () => {
               __typename: 'Shipment',
               address: {
                 street: 'pike',
-                postal: 98102,
+                postal: 98102
               },
               shipper: {
                 id: 'shipper0',
-                __typename: 'Shipper',
-              },
+                __typename: 'Shipper'
+              }
             },
             {
               id: 'shipment1',
               __typename: 'Shipment',
               address: {
                 street: 'pine',
-                postal: 98102,
+                postal: 98102
               },
               shipper: {
                 id: 'shipper1',
-                __typename: 'Shipper',
-              },
-            },
-          ],
-        },
-      },
+                __typename: 'Shipper'
+              }
+            }
+          ]
+        }
+      }
     });
   });
 
@@ -98,18 +97,18 @@ describe(`writeFragment with paramterized references in an array`, () => {
       fragment: fragments,
       fragmentName: 'shipment',
       variables: {
-        area: 'PNW',
+        area: 'PNW'
       },
       data: {
         id: 'shipment0',
         address: {
-          street: '4th & pike',
+          street: '4th & pike'
         },
         shipper: {
           id: 'shipper0',
-          name: 'Munster',
-        },
-      },
+          name: 'Munster'
+        }
+      }
     });
 
     const parameterizedShipmentId = nodeIdForParameterizedValue(
@@ -124,27 +123,33 @@ describe(`writeFragment with paramterized references in an array`, () => {
       { operation: 'PNW' }
     );
 
-    expect(hermes.getCurrentCacheSnapshot().baseline.getNodeSnapshot('shipment0')).to.deep.eq(
+    expect(
+      hermes.getCurrentCacheSnapshot().baseline.getNodeSnapshot('shipment0')
+    ).to.deep.eq(
       new EntitySnapshot(
         {
           id: 'shipment0',
           __typename: 'Shipment',
           address: {
             street: '4th & pike',
-            postal: 98102,
-          },
+            postal: 98102
+          }
         },
         [{ id: parameterizedShipmentId, path: [0] }],
-        [{ id: parameterizedShipperId, path: ['shipper'] }],
+        [{ id: parameterizedShipperId, path: ['shipper'] }]
       )
     );
 
-    expect(hermes.getCurrentCacheSnapshot().baseline.getNodeSnapshot(parameterizedShipperId)).to.deep.eq(
+    expect(
+      hermes
+        .getCurrentCacheSnapshot()
+        .baseline.getNodeSnapshot(parameterizedShipperId)
+    ).to.deep.eq(
       new ParameterizedValueSnapshot(
         {
           id: 'shipper0',
           __typename: 'Shipper',
-          name: 'Munster',
+          name: 'Munster'
         },
         [{ id: 'shipment0', path: ['shipper'] }],
         [{ id: 'shipper0', path: [] }]
@@ -159,21 +164,24 @@ describe(`writeFragment with paramterized references in an array`, () => {
       fragmentName: 'shipper',
       data: {
         id: 'shipper0',
-        email: 'munster@monsterInc.com',
-      },
+        email: 'munster@monsterInc.com'
+      }
     });
 
-    expect(hermes.getCurrentCacheSnapshot().baseline.getNodeData('shipper0')).to.deep.eq({
+    expect(
+      hermes.getCurrentCacheSnapshot().baseline.getNodeData('shipper0')
+    ).to.deep.eq({
       id: 'shipper0',
       __typename: 'Shipper',
       name: 'Munster',
-      email: 'munster@monsterInc.com',
+      email: 'munster@monsterInc.com'
     });
   });
 
   it(`correctly read cache after multiple writeFragments`, () => {
-    expect(hermes.readQuery({
-      query: gql(`
+    expect(
+      hermes.readQuery({
+        query: gql(`
       query readViewer($city: String!, $area: String!) {
         viewer {
           id
@@ -192,11 +200,12 @@ describe(`writeFragment with paramterized references in an array`, () => {
         }
       }
     `),
-      variables: {
-        city: 'Seattle',
-        area: 'PNW',
-      },
-    })).to.deep.eq({
+        variables: {
+          city: 'Seattle',
+          area: 'PNW'
+        }
+      })
+    ).to.deep.eq({
       viewer: {
         id: 123,
         name: 'Gouda',
@@ -207,30 +216,29 @@ describe(`writeFragment with paramterized references in an array`, () => {
             __typename: 'Shipment',
             address: {
               street: '4th & pike',
-              postal: 98102,
+              postal: 98102
             },
             shipper: {
               id: 'shipper0',
               __typename: 'Shipper',
               name: 'Munster',
-              email: 'munster@monsterInc.com',
-            },
+              email: 'munster@monsterInc.com'
+            }
           },
           {
             id: 'shipment1',
             __typename: 'Shipment',
             address: {
               street: 'pine',
-              postal: 98102,
+              postal: 98102
             },
             shipper: {
               id: 'shipper1',
-              __typename: 'Shipper',
-            },
-          },
-        ],
-      },
+              __typename: 'Shipper'
+            }
+          }
+        ]
+      }
     });
   });
-
 });

@@ -3,29 +3,26 @@ import gql from 'graphql-tag';
 import { Hermes } from '../../../../src/apollo/Hermes';
 import { CacheContext } from '../../../../src/context/CacheContext';
 import { nodeIdForParameterizedValue } from '../../../../src/operations/SnapshotEditor';
-import { StaticNodeId, Serializable } from '../../../../src/schema';
+import { Serializable, StaticNodeId } from '../../../../src/schema';
 import { strictConfig } from '../../../helpers/context';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`readFragment with parameterized values`, () => {
-
   let hermes: Hermes;
   beforeAll(() => {
     hermes = new Hermes(new CacheContext(strictConfig));
-    const parameterizedId = nodeIdForParameterizedValue(
-      '123',
-      ['shipment'],
-      { city: 'Seattle' }
-    );
+    const parameterizedId = nodeIdForParameterizedValue('123', ['shipment'], {
+      city: 'Seattle'
+    });
 
     hermes.restore({
       [QueryRootId]: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         outbound: [{ id: '123', path: ['viewer'] }],
         data: {
-          justValue: '42',
-        },
+          justValue: '42'
+        }
       },
       '123': {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
@@ -34,8 +31,8 @@ describe(`readFragment with parameterized values`, () => {
         data: {
           id: 123,
           name: 'Gouda',
-          __typename: 'Viewer',
-        },
+          __typename: 'Viewer'
+        }
       },
       [parameterizedId]: {
         type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
@@ -44,16 +41,17 @@ describe(`readFragment with parameterized values`, () => {
           __typename: 'Shipment',
           destination: 'Seattle',
           complete: false,
-          truckType: 'flat-bed',
-        },
-      },
+          truckType: 'flat-bed'
+        }
+      }
     });
   });
 
   it(`returns parameterized data`, () => {
-    expect(hermes.readFragment({
-      id: '123',
-      fragment: gql(`
+    expect(
+      hermes.readFragment({
+        id: '123',
+        fragment: gql(`
         fragment viewer on Viewer {
           id
           name
@@ -66,10 +64,11 @@ describe(`readFragment with parameterized values`, () => {
           }
         }
       `),
-      variables: {
-        city: 'Seattle',
-      },
-    })).to.be.deep.eq({
+        variables: {
+          city: 'Seattle'
+        }
+      })
+    ).to.be.deep.eq({
       id: 123,
       name: 'Gouda',
       __typename: 'Viewer',
@@ -77,9 +76,8 @@ describe(`readFragment with parameterized values`, () => {
         __typename: 'Shipment',
         destination: 'Seattle',
         complete: false,
-        truckType: 'flat-bed',
-      },
+        truckType: 'flat-bed'
+      }
     });
   });
-
 });

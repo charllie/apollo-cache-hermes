@@ -1,13 +1,15 @@
 import { extract } from '../../../../../src/operations/extract';
 import { nodeIdForParameterizedValue } from '../../../../../src/operations/SnapshotEditor';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`nested parameterized references with parameterized value`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
@@ -17,10 +19,10 @@ describe(`operations.extract`, () => {
             two: {
               three: {
                 id: 31,
-                four: { five: 1 },
-              },
-            },
-          },
+                four: { five: 1 }
+              }
+            }
+          }
         },
         `query nested($id: ID!) {
           one {
@@ -57,33 +59,32 @@ describe(`operations.extract`, () => {
       jestExpect(extractResult).toEqual({
         [QueryRootId]: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
-          outbound: [{ id: parameterizedId, path: ['one', 'two'] }],
+          outbound: [{ id: parameterizedId, path: ['one', 'two'] }]
         },
         [parameterizedId]: {
           type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
           inbound: [{ id: QueryRootId, path: ['one', 'two'] }],
           outbound: [{ id: '31', path: ['three'] }],
           data: {
-            three: undefined,
-          },
+            three: undefined
+          }
         },
         '31': {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: parameterizedId, path: ['three'] }],
           outbound: [{ id: nestedParameterizedId, path: ['four'] }],
           data: {
-            id: 31,
-          },
+            id: 31
+          }
         },
         [nestedParameterizedId]: {
           type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
           inbound: [{ id: '31', path: ['four'] }],
           data: {
-            five: 1,
-          },
-        },
+            five: 1
+          }
+        }
       });
     });
-
   });
 });

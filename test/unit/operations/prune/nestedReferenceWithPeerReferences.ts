@@ -1,6 +1,10 @@
 import { extract, prune } from '../../../../src/operations';
 import { Serializable, StaticNodeId } from '../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext, query } from '../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext,
+  query
+} from '../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
@@ -13,9 +17,9 @@ describe(`operations.prune`, () => {
         one: {
           two: {
             three: { id: 0 },
-            four: { id: 1 },
-          },
-        },
+            four: { id: 1 }
+          }
+        }
       },
       `{ 
           one {
@@ -43,23 +47,20 @@ describe(`operations.prune`, () => {
     jestExpect(extractResult).toEqual({
       [QueryRootId]: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
-        outbound: [
-          { id: '1', path: ['one', 'two', 'four'] },
-        ],
+        outbound: [{ id: '1', path: ['one', 'two', 'four'] }],
         data: {
           one: {
             two: {
-              four: undefined,
-            },
-          },
-        },
+              four: undefined
+            }
+          }
+        }
       },
       '1': {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         inbound: [{ id: QueryRootId, path: ['one', 'two', 'four'] }],
-        data: { id: 1 },
-      },
+        data: { id: 1 }
+      }
     });
   });
-
 });

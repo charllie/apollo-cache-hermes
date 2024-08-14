@@ -11,8 +11,8 @@ export const strictConfig: CacheContext.Configuration = {
       throw new Error(util.format(`warn:`, message, ...args));
     },
     group: jest.fn(),
-    groupEnd: jest.fn(),
-  },
+    groupEnd: jest.fn()
+  }
 };
 
 export const silentConfig: CacheContext.Configuration = {
@@ -22,8 +22,8 @@ export const silentConfig: CacheContext.Configuration = {
     info: jest.fn(),
     warn: jest.fn(),
     group: jest.fn(),
-    groupEnd: jest.fn(),
-  },
+    groupEnd: jest.fn()
+  }
 };
 
 /** Cache context created using strictConfig */

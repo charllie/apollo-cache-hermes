@@ -6,7 +6,6 @@ import { query, strictConfig } from '../../../helpers';
 
 describe(`context.CacheContext`, () => {
   describe(`entityUpdaters with updateListOfReference during optimistic change`, () => {
-
     const dashboardQuery = query(`
       query dashboard {
         dashboard {
@@ -41,7 +40,9 @@ describe(`context.CacheContext`, () => {
         const prevActive = previous && previous.active;
         if (nextActive === prevActive) return;
 
-        const dashboardId = user ? user.currentDashboard.id : previous.currentDashboard.id;
+        const dashboardId = user
+          ? user.currentDashboard.id
+          : previous.currentDashboard.id;
         const userId = user ? user.id : previous.id;
 
         dataProxy.updateListOfReferences(
@@ -52,7 +53,7 @@ describe(`context.CacheContext`, () => {
               fragment user on User {
                 id
               }
-            `),
+            `)
           },
           {
             readFragment: gql(`
@@ -65,16 +66,20 @@ describe(`context.CacheContext`, () => {
                   currentDashboard { id }
                 }
               }
-            `),
+            `)
           },
-          (previousUsers) => {
+          previousUsers => {
             if (!previousUsers) {
               return previousUsers;
             }
             if (!nextActive) {
               // Remove users once they're no longer active.
-              return previousUsers.filter((activeUser: any) => activeUser.id !== userId);
-            } else if (previousUsers.findIndex((u: any) => u.id === userId) === -1) {
+              return previousUsers.filter(
+                (activeUser: any) => activeUser.id !== userId
+              );
+            } else if (
+              previousUsers.findIndex((u: any) => u.id === userId) === -1
+            ) {
               // Insert newly active users if they're not already in the list.
               return [...previousUsers, user];
             } else {
@@ -84,7 +89,7 @@ describe(`context.CacheContext`, () => {
         );
       },
 
-      Query() {},
+      Query() {}
     };
 
     const userUpdater = jest.spyOn(entityUpdaters, 'User');
@@ -103,17 +108,17 @@ describe(`context.CacheContext`, () => {
               id: 1,
               name: 'Gouda',
               active: true,
-              currentDashboard: { id: 'dash0' },
+              currentDashboard: { id: 'dash0' }
             },
             {
               __typename: 'User',
               id: 2,
               name: 'Munster',
               active: true,
-              currentDashboard: { id: 'dash0' },
-            },
-          ],
-        },
+              currentDashboard: { id: 'dash0' }
+            }
+          ]
+        }
       });
 
       userUpdater.mockClear();
@@ -121,23 +126,20 @@ describe(`context.CacheContext`, () => {
     });
 
     it(`triggers updaters when an entity is added`, () => {
-      cache.transaction(
-        /** changeIdOrCallback */ 'opt0',
-        (transaction) => {
-          transaction.write(
-            { ...getUserQuery, variables: { id: 4 } },
-            {
-              user: {
-                __typename: 'User',
-                id: 3,
-                name: 'Cheddar',
-                active: true,
-                currentDashboard: { id: 'dash0' },
-              },
+      cache.transaction(/** changeIdOrCallback */ 'opt0', transaction => {
+        transaction.write(
+          { ...getUserQuery, variables: { id: 4 } },
+          {
+            user: {
+              __typename: 'User',
+              id: 3,
+              name: 'Cheddar',
+              active: true,
+              currentDashboard: { id: 'dash0' }
             }
-          );
-        }
-      );
+          }
+        );
+      });
 
       expect(userUpdater.mock.calls.length).to.eq(1);
       const [, user, previous] = userUpdater.mock.calls[0];
@@ -148,77 +150,66 @@ describe(`context.CacheContext`, () => {
         active: true,
         currentDashboard: {
           id: 'dash0',
-          name: 'Main Dashboard',
-        },
+          name: 'Main Dashboard'
+        }
       });
       expect(previous).to.deep.eq(undefined);
     });
 
     it(`triggers updaters when an entity is orphaned`, () => {
-      cache.transaction(
-        /** changeIdOrCallback */ 'opt1',
-        (transaction) => {
-          transaction.write(
-            dashboardQuery,
-            {
-              dashboard: {
-                name: 'Main Dashboard',
-                id: 'dash0',
-                users: [
-                  {
-                    __typename: 'User',
-                    id: 2,
-                    name: 'Munster',
-                    active: true,
-                    currentDashboard: {
-                      id: 'dash0',
-                      name: 'Main Dashboard',
-                    },
-                  },
-                ],
-              },
-            }
-          );
-        }
-      );
+      cache.transaction(/** changeIdOrCallback */ 'opt1', transaction => {
+        transaction.write(dashboardQuery, {
+          dashboard: {
+            name: 'Main Dashboard',
+            id: 'dash0',
+            users: [
+              {
+                __typename: 'User',
+                id: 2,
+                name: 'Munster',
+                active: true,
+                currentDashboard: {
+                  id: 'dash0',
+                  name: 'Main Dashboard'
+                }
+              }
+            ]
+          }
+        });
+      });
 
       expect(userUpdater.mock.calls.length).to.eq(1);
       const [, user, previous] = userUpdater.mock.calls[0];
       expect(user).to.eq(undefined);
-      expect(previous).to.deep.eq(
-        {
-          __typename: 'User',
-          id: 1,
-          name: 'Gouda',
-          active: true,
-          currentDashboard: {
-            id: 'dash0',
-            name: 'Main Dashboard',
-          },
+      expect(previous).to.deep.eq({
+        __typename: 'User',
+        id: 1,
+        name: 'Gouda',
+        active: true,
+        currentDashboard: {
+          id: 'dash0',
+          name: 'Main Dashboard'
         }
-      );
+      });
     });
 
     it(`respects writes by updaters`, () => {
-      cache.transaction(
-        /** changeIdOrCallback */ 'opt2',
-        (transaction) => {
-          transaction.write(
-            { ...getUserQuery, variables: { id: 2 } },
-            {
-              user: {
-                __typename: 'User',
-                id: 2,
-                name: 'Munster',
-                active: false,
-                currentDashboard: {
-                  id: 'dash0',
-                },
-              },
+      cache.transaction(/** changeIdOrCallback */ 'opt2', transaction => {
+        transaction.write(
+          { ...getUserQuery, variables: { id: 2 } },
+          {
+            user: {
+              __typename: 'User',
+              id: 2,
+              name: 'Munster',
+              active: false,
+              currentDashboard: {
+                id: 'dash0'
+              }
             }
-          );
-        }
-      );
+          }
+        );
+      });
 
       expect(cache.read(dashboardQuery).result).to.deep.eq({
         dashboard: {
@@ -232,8 +223,8 @@ describe(`context.CacheContext`, () => {
               active: true,
               currentDashboard: {
                 id: 'dash0',
-                name: 'Main Dashboard',
-              },
+                name: 'Main Dashboard'
+              }
             },
             {
               __typename: 'User',
@@ -242,14 +233,16 @@ describe(`context.CacheContext`, () => {
               active: true,
               currentDashboard: {
                 id: 'dash0',
-                name: 'Main Dashboard',
-              },
-            },
-          ],
-        },
+                name: 'Main Dashboard'
+              }
+            }
+          ]
+        }
       });
 
-      expect(cache.read(dashboardQuery, /* optimistic */ true).result).to.deep.eq({
+      expect(
+        cache.read(dashboardQuery, /* optimistic */ true).result
+      ).to.deep.eq({
         dashboard: {
           name: 'Main Dashboard',
           id: 'dash0',
@@ -261,13 +254,12 @@ describe(`context.CacheContext`, () => {
               active: true,
               currentDashboard: {
                 id: 'dash0',
-                name: 'Main Dashboard',
-              },
-            },
-          ],
-        },
+                name: 'Main Dashboard'
+              }
+            }
+          ]
+        }
       });
     });
-
   });
 });

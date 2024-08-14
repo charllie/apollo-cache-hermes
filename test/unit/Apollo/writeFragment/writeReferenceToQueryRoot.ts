@@ -10,7 +10,6 @@ import { strictConfig } from '../../../helpers/context';
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`writeFragment directly to root query`, () => {
-
   let hermes: Hermes, baseline: GraphSnapshot;
   beforeAll(() => {
     hermes = new Hermes(new CacheContext(strictConfig));
@@ -26,8 +25,8 @@ describe(`writeFragment directly to root query`, () => {
       data: {
         id: 123,
         name: 'Gouda',
-        __typename: 'Viewer',
-      },
+        __typename: 'Viewer'
+      }
     });
     baseline = hermes.getCurrentCacheSnapshot().baseline;
   });
@@ -38,13 +37,15 @@ describe(`writeFragment directly to root query`, () => {
         {
           id: 123,
           name: 'Gouda',
-          __typename: 'Viewer',
+          __typename: 'Viewer'
         },
         /* inbound */ undefined,
-        [{ id: '123', path: [] }],
+        [{ id: '123', path: [] }]
       )
     );
-    expect(baseline.getNodeData(QueryRootId)).to.eq(baseline.getNodeData('123'));
+    expect(baseline.getNodeData(QueryRootId)).to.eq(
+      baseline.getNodeData('123')
+    );
   });
 
   it(`correctly add new reference`, () => {
@@ -53,12 +54,11 @@ describe(`writeFragment directly to root query`, () => {
         {
           id: 123,
           name: 'Gouda',
-          __typename: 'Viewer',
+          __typename: 'Viewer'
         },
         [{ id: QueryRootId, path: [] }],
-        /* outbound */ undefined,
+        /* outbound */ undefined
       )
     );
   });
-
 });

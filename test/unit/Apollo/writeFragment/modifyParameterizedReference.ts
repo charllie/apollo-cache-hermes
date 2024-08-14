@@ -4,18 +4,15 @@ import { Hermes } from '../../../../src/apollo/Hermes';
 import { CacheContext } from '../../../../src/context/CacheContext';
 import { GraphSnapshot } from '../../../../src/GraphSnapshot';
 import { nodeIdForParameterizedValue } from '../../../../src/operations/SnapshotEditor';
-import { StaticNodeId, Serializable } from '../../../../src/schema';
+import { Serializable, StaticNodeId } from '../../../../src/schema';
 import { strictConfig } from '../../../helpers/context';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`writeFragment with parameterized references`, () => {
-
-  const parameterizedId = nodeIdForParameterizedValue(
-    '123',
-    ['shipment'],
-    { city: 'Seattle' }
-  );
+  const parameterizedId = nodeIdForParameterizedValue('123', ['shipment'], {
+    city: 'Seattle'
+  });
 
   let hermes: Hermes, baseline: GraphSnapshot;
   beforeAll(() => {
@@ -25,8 +22,8 @@ describe(`writeFragment with parameterized references`, () => {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         outbound: [{ id: '123', path: ['viewer'] }],
         data: {
-          justValue: '42',
-        },
+          justValue: '42'
+        }
       },
       '123': {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
@@ -35,25 +32,25 @@ describe(`writeFragment with parameterized references`, () => {
         data: {
           id: 123,
           name: 'Gouda',
-          __typename: 'Viewer',
-        },
+          __typename: 'Viewer'
+        }
       },
       [parameterizedId]: {
         type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
         inbound: [{ id: '123', path: ['shipment'] }],
         outbound: [{ id: 'shipment0', path: [] }],
-        data: null,
+        data: null
       },
-      'shipment0': {
+      shipment0: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         inbound: [{ id: [parameterizedId], path: [] }],
         data: {
           id: 'shipment0',
           destination: 'Seattle',
           complete: false,
-          truckType: 'flat-bed',
-        },
-      },
+          truckType: 'flat-bed'
+        }
+      }
     });
 
     hermes.writeFragment({
@@ -69,16 +66,16 @@ describe(`writeFragment with parameterized references`, () => {
         }
       `),
       variables: {
-        city: 'Seattle',
+        city: 'Seattle'
       },
       data: {
         id: 123,
         shipment: {
           id: 'shipment0',
           complete: true,
-          truckType: 'flatbed',
-        },
-      },
+          truckType: 'flatbed'
+        }
+      }
     });
     baseline = hermes.getCurrentCacheSnapshot().baseline;
   });
@@ -88,7 +85,7 @@ describe(`writeFragment with parameterized references`, () => {
       complete: true,
       truckType: 'flatbed',
       id: 'shipment0',
-      destination: 'Seattle',
+      destination: 'Seattle'
     });
   });
 
@@ -100,10 +97,11 @@ describe(`writeFragment with parameterized references`, () => {
         complete: true,
         truckType: 'flatbed',
         id: 'shipment0',
-        destination: 'Seattle',
-      },
+        destination: 'Seattle'
+      }
     });
-    expect(baseline.getNodeData(parameterizedId)).to.eq(baseline.getNodeData('shipment0'));
+    expect(baseline.getNodeData(parameterizedId)).to.eq(
+      baseline.getNodeData('shipment0')
+    );
   });
-
 });

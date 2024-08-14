@@ -11,7 +11,6 @@ import { strictConfig } from '../../../helpers/context';
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`writeFragment with nested paramterized value`, () => {
-
   let hermes: Hermes;
   beforeAll(() => {
     hermes = new Hermes(new CacheContext(strictConfig));
@@ -37,11 +36,11 @@ describe(`writeFragment with nested paramterized value`, () => {
           trucks: [
             {
               name: 'truck0',
-              year: '1998',
-            },
-          ],
-        },
-      },
+              year: '1998'
+            }
+          ]
+        }
+      }
     });
   });
 
@@ -64,15 +63,15 @@ describe(`writeFragment with nested paramterized value`, () => {
           {
             name: 'truck0',
             year: '1998',
-            driverName: 'Bob',
+            driverName: 'Bob'
           },
           {
             name: 'truck1',
             year: '1997',
-            driverName: 'Bob',
-          },
-        ],
-      },
+            driverName: 'Bob'
+          }
+        ]
+      }
     });
 
     const parameterizedTruckId = nodeIdForParameterizedValue(
@@ -81,31 +80,37 @@ describe(`writeFragment with nested paramterized value`, () => {
       { number: 2 }
     );
 
-    expect(hermes.getCurrentCacheSnapshot().baseline.getNodeSnapshot('123')).to.deep.eq(
+    expect(
+      hermes.getCurrentCacheSnapshot().baseline.getNodeSnapshot('123')
+    ).to.deep.eq(
       new EntitySnapshot(
         {
           id: 123,
           name: 'Gouda',
-          __typename: 'Viewer',
+          __typename: 'Viewer'
         },
         [{ id: QueryRootId, path: ['viewer'] }],
         [{ id: parameterizedTruckId, path: ['trucks'] }]
       )
     );
 
-    expect(hermes.getCurrentCacheSnapshot().baseline.getNodeSnapshot(parameterizedTruckId)).to.deep.eq(
+    expect(
+      hermes
+        .getCurrentCacheSnapshot()
+        .baseline.getNodeSnapshot(parameterizedTruckId)
+    ).to.deep.eq(
       new ParameterizedValueSnapshot(
         [
           {
             name: 'truck0',
             year: '1998',
-            driverName: 'Bob',
+            driverName: 'Bob'
           },
           {
             name: 'truck1',
             year: '1997',
-            driverName: 'Bob',
-          },
+            driverName: 'Bob'
+          }
         ],
         [{ id: '123', path: ['trucks'] }]
       )
@@ -131,10 +136,10 @@ describe(`writeFragment with nested paramterized value`, () => {
           {
             name: 'truck0',
             year: '1998',
-            driverName: 'Bob',
-          },
-        ],
-      },
+            driverName: 'Bob'
+          }
+        ]
+      }
     });
 
     const parameterizedTruckId = nodeIdForParameterizedValue(
@@ -143,30 +148,35 @@ describe(`writeFragment with nested paramterized value`, () => {
       { number: 2 }
     );
 
-    expect(hermes.getCurrentCacheSnapshot().baseline.getNodeSnapshot('123')).to.deep.eq(
+    expect(
+      hermes.getCurrentCacheSnapshot().baseline.getNodeSnapshot('123')
+    ).to.deep.eq(
       new EntitySnapshot(
         {
           id: 123,
           name: 'Gouda',
-          __typename: 'Viewer',
+          __typename: 'Viewer'
         },
         [{ id: QueryRootId, path: ['viewer'] }],
         [{ id: parameterizedTruckId, path: ['trucks'] }]
       )
     );
 
-    expect(hermes.getCurrentCacheSnapshot().baseline.getNodeSnapshot(parameterizedTruckId)).to.deep.eq(
+    expect(
+      hermes
+        .getCurrentCacheSnapshot()
+        .baseline.getNodeSnapshot(parameterizedTruckId)
+    ).to.deep.eq(
       new ParameterizedValueSnapshot(
         [
           {
             name: 'truck0',
             year: '1998',
-            driverName: 'Bob',
-          },
+            driverName: 'Bob'
+          }
         ],
         [{ id: '123', path: ['trucks'] }]
       )
     );
   });
-
 });

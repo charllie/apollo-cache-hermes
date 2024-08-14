@@ -1,13 +1,15 @@
 import { extract } from '../../../../../src/operations/extract';
 import { nodeIdForParameterizedValue } from '../../../../../src/operations/SnapshotEditor';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`nested parameterized value`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
@@ -18,10 +20,10 @@ describe(`operations.extract`, () => {
               three: {
                 id: '31',
                 name: 'Three',
-                extraValue: 42,
-              },
-            },
-          },
+                extraValue: 42
+              }
+            }
+          }
         },
         `query getAFoo($id: ID!) {
           one {
@@ -49,13 +51,13 @@ describe(`operations.extract`, () => {
       jestExpect(extractResult).toEqual({
         [QueryRootId]: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
-          outbound: [{ id: parameterizedId, path: ['one', 'two', 'three'] }],
+          outbound: [{ id: parameterizedId, path: ['one', 'two', 'three'] }]
         },
         [parameterizedId]: {
           type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
           inbound: [{ id: QueryRootId, path: ['one', 'two', 'three'] }],
           outbound: [{ id: '31', path: [] }],
-          data: null,
+          data: null
         },
         '31': {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
@@ -63,11 +65,10 @@ describe(`operations.extract`, () => {
           data: {
             id: '31',
             name: 'Three',
-            extraValue: 42,
-          },
-        },
+            extraValue: 42
+          }
+        }
       });
     });
-
   });
 });

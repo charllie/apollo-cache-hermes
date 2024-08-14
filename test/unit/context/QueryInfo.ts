@@ -7,11 +7,9 @@ import { QueryInfo } from '../../../src/context/QueryInfo';
 import { strictConfig } from '../../helpers';
 
 describe(`context.QueryInfo`, () => {
-
   const context = new CacheContext(strictConfig);
 
   describe(`with a valid query document`, () => {
-
     let query: DocumentNode, info: QueryInfo;
     beforeAll(() => {
       query = gql`
@@ -21,7 +19,9 @@ describe(`context.QueryInfo`, () => {
         }
 
         query getThings($ids: [ID]!) {
-          stuff { ...completeStuff }
+          stuff {
+            ...completeStuff
+          }
           things(ids: $ids) {
             ...completeThing
           }
@@ -51,21 +51,26 @@ describe(`context.QueryInfo`, () => {
     });
 
     it(`builds a fragment map`, () => {
-      expect(info.fragmentMap).to.have.all.keys('completeStuff', 'completeThing');
+      expect(info.fragmentMap).to.have.all.keys(
+        'completeStuff',
+        'completeThing'
+      );
     });
 
     it(`collects the variables that are used`, () => {
       expect(info.variables).to.deep.eq(new Set(['ids']));
     });
-
   });
 
   describe(`with variable defaults`, () => {
-
     let query: DocumentNode, info: QueryInfo;
     beforeAll(() => {
       query = gql`
-        mutation makeCheesy($ids: [ID]!, $name: String = "Munster", $stinky: Boolean) {
+        mutation makeCheesy(
+          $ids: [ID]!
+          $name: String = "Munster"
+          $stinky: Boolean
+        ) {
           updateCheesiness(ids: $ids, name: $name, stinky: $stinky)
         }
       `;
@@ -88,59 +93,71 @@ describe(`context.QueryInfo`, () => {
     it(`excludes required parameters from the defaults`, () => {
       expect(info.variableDefaults).to.not.have.key('ids');
     });
-
   });
 
   describe(`validation`, () => {
-
     it(`asserts that all variables are declared`, () => {
       expect(() => {
-        new QueryInfo(context, buildRawOperationFromQuery(gql`
-          query whoops($foo: Number) {
-            thing(foo: $foo, bar: $bar, baz: $baz)
-          }
-        `));
+        new QueryInfo(
+          context,
+          buildRawOperationFromQuery(gql`
+            query whoops($foo: Number) {
+              thing(foo: $foo, bar: $bar, baz: $baz)
+            }
+          `)
+        );
       }).to.throw(/\$bar(.|\n)*\$baz/);
     });
 
     it(`asserts that all variables are declared, when used via fragments`, () => {
       expect(() => {
-        new QueryInfo(context, buildRawOperationFromQuery(gql`
-          query whoops($foo: Number) {
-            thing { ...stuff }
-          }
+        new QueryInfo(
+          context,
+          buildRawOperationFromQuery(gql`
+            query whoops($foo: Number) {
+              thing {
+                ...stuff
+              }
+            }
 
-          fragment stuff on Thing {
-            stuff(foo: $foo, bar: $bar, baz: $baz)
-          }
-        `));
+            fragment stuff on Thing {
+              stuff(foo: $foo, bar: $bar, baz: $baz)
+            }
+          `)
+        );
       }).to.throw(/\$bar(.|\n)*\$baz/);
     });
 
     it(`asserts that all variables are used`, () => {
       expect(() => {
-        new QueryInfo(context, buildRawOperationFromQuery(gql`
-          query whoops($foo: Number, $bar: String, $baz: ID) {
-            thing(bar: $bar)
-          }
-        `));
+        new QueryInfo(
+          context,
+          buildRawOperationFromQuery(gql`
+            query whoops($foo: Number, $bar: String, $baz: ID) {
+              thing(bar: $bar)
+            }
+          `)
+        );
       }).to.throw(/\$foo(.|\n)*\$baz/);
     });
 
     it(`asserts that all variables are used, including fragments`, () => {
       expect(() => {
-        new QueryInfo(context, buildRawOperationFromQuery(gql`
-          query whoops($foo: Number, $bar: String, $baz: ID) {
-            thing { ...stuff }
-          }
+        new QueryInfo(
+          context,
+          buildRawOperationFromQuery(gql`
+            query whoops($foo: Number, $bar: String, $baz: ID) {
+              thing {
+                ...stuff
+              }
+            }
 
-          fragment stuff on Thing {
-            thing(bar: $bar)
-          }
-        `));
+            fragment stuff on Thing {
+              thing(bar: $bar)
+            }
+          `)
+        );
       }).to.throw(/\$foo(.|\n)*\$baz/);
     });
-
   });
-
 });

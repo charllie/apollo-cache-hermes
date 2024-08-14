@@ -2,7 +2,11 @@ import { CacheContext } from '../../../../src/context/CacheContext';
 import { GraphSnapshot } from '../../../../src/GraphSnapshot';
 import { extract, prune } from '../../../../src/operations';
 import { Serializable, StaticNodeId } from '../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext, query } from '../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext,
+  query
+} from '../../../helpers';
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.prune`, () => {
@@ -16,16 +20,12 @@ describe(`operations.prune`, () => {
           elements: [
             [
               { id: 'a', value: 1 },
-              { id: 'b', value: 2 },
+              { id: 'b', value: 2 }
             ],
-            [
-              { id: 'c', value: 3 },
-              { id: 'd', value: 4 },
-              null,
-            ],
-            null,
-          ],
-        },
+            [{ id: 'c', value: 3 }, { id: 'd', value: 4 }, null],
+            null
+          ]
+        }
       },
       `query getTable($tableName: String!) {
         rows {
@@ -36,7 +36,7 @@ describe(`operations.prune`, () => {
         }
       }`,
       cacheContext,
-      { tableName: 'This is table name' },
+      { tableName: 'This is table name' }
     );
   });
 
@@ -49,7 +49,8 @@ describe(`operations.prune`, () => {
             value
           }
         }
-      }`, { tableName: 'Something else' }
+      }`,
+      { tableName: 'Something else' }
     );
     const pruned = prune(cacheContext, snapshot, pruneQuery);
     jestExpect(pruned.complete).toBeFalsy();
@@ -58,9 +59,8 @@ describe(`operations.prune`, () => {
     jestExpect(extractResult).toEqual({
       [QueryRootId]: {
         data: { rows: null },
-        type: Serializable.NodeSnapshotType.EntitySnapshot,
-      },
+        type: Serializable.NodeSnapshotType.EntitySnapshot
+      }
     });
   });
-
 });

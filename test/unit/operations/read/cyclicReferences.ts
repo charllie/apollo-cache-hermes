@@ -7,13 +7,11 @@ import { query, strictConfig } from '../../../helpers';
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.read`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
 
   describe(`cyclic references`, () => {
     describe(`in a complete cache`, () => {
-
       let cyclicQuery: RawOperation, snapshot: GraphSnapshot;
       beforeAll(() => {
         cyclicQuery = query(`{
@@ -37,9 +35,9 @@ describe(`operations.read`, () => {
               id: 2,
               name: 'Bar',
               fizz: { id: 1 },
-              buzz: { id: 2 },
-            },
-          },
+              buzz: { id: 2 }
+            }
+          }
         }).snapshot;
       });
 
@@ -65,13 +63,13 @@ describe(`operations.read`, () => {
 
       it(`includes all related node ids, if requested`, () => {
         const { entityIds } = read(context, cyclicQuery, snapshot, true);
-        jestExpect(Array.from(entityIds)).toEqual(jestExpect.arrayContaining([QueryRootId, '1', '2']));
+        jestExpect(Array.from(entityIds)).toEqual(
+          jestExpect.arrayContaining([QueryRootId, '1', '2'])
+        );
       });
-
     });
 
     describe(`in a partial cache`, () => {
-
       let cyclicQuery: RawOperation, snapshot: GraphSnapshot;
       beforeAll(() => {
         cyclicQuery = query(`{
@@ -95,9 +93,9 @@ describe(`operations.read`, () => {
               id: 2,
               name: null,
               fizz: { id: 1 },
-              buzz: { id: 2 },
-            },
-          },
+              buzz: { id: 2 }
+            }
+          }
         }).snapshot;
       });
 
@@ -123,11 +121,10 @@ describe(`operations.read`, () => {
 
       it(`includes all related node ids, if requested`, () => {
         const { entityIds } = read(context, cyclicQuery, snapshot, true);
-        jestExpect(Array.from(entityIds)).toEqual(jestExpect.arrayContaining([QueryRootId, '1', '2']));
+        jestExpect(Array.from(entityIds)).toEqual(
+          jestExpect.arrayContaining([QueryRootId, '1', '2'])
+        );
       });
-
     });
-
   });
-
 });

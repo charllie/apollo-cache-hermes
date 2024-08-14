@@ -1,18 +1,17 @@
 import gql from 'graphql-tag';
 
 import { Hermes } from '../../../../src/apollo/Hermes';
-import { strictConfig } from '../../../helpers/context';
 import { StaticNodeId } from '../../../../src/schema';
+import { strictConfig } from '../../../helpers/context';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`writeFragment with missing __typename`, () => {
-
   let hermes: Hermes;
   beforeAll(() => {
     hermes = new Hermes({
       ...strictConfig,
-      addTypename: true,
+      addTypename: true
     });
   });
 
@@ -28,10 +27,11 @@ describe(`writeFragment with missing __typename`, () => {
         `),
         data: {
           id: 123,
-          name: 'Gouda',
-        },
+          name: 'Gouda'
+        }
       });
-    }).to.throw(/InvalidPayloadError: Encountered undefined payload value for __typename/i);
+    }).to.throw(
+      /InvalidPayloadError: Encountered undefined payload value for __typename/i
+    );
   });
-
 });

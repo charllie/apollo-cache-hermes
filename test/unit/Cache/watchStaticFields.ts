@@ -4,7 +4,6 @@ import { Cache } from '../../../src';
 import { query, strictConfig } from '../../helpers';
 
 describe(`Cache#watch`, () => {
-
   const fullGraph = query(`{
     foo {
       id
@@ -51,13 +50,13 @@ describe(`Cache#watch`, () => {
       id: 1,
       bar: {
         id: 2,
-        name: 'bar',
+        name: 'bar'
       },
       baz: {
         id: 3,
-        name: 'baz',
-      },
-    },
+        name: 'baz'
+      }
+    }
   };
 
   let cache: Cache;
@@ -91,7 +90,9 @@ describe(`Cache#watch`, () => {
   it(`doesn't trigger a callback if unrelated entities change`, () => {
     const updates: CacheInterface.DiffResult<any>[] = [];
     cache.watch(simpleGraph, newResult => updates.push(newResult));
-    cache.write(partialOverlap, { foo: { id: 1, baz: { id: 3, name: 'baz2' } } });
+    cache.write(partialOverlap, {
+      foo: { id: 1, baz: { id: 3, name: 'baz2' } }
+    });
 
     expect(updates.length).to.eq(1);
   });
@@ -121,7 +122,9 @@ describe(`Cache#watch`, () => {
   it(`handles transitions from complete to incomplete`, () => {
     const updates: CacheInterface.DiffResult<any>[] = [];
     cache.watch(simpleGraph, newResult => updates.push(newResult));
-    cache.write(partialOverlap, { foo: { id: 100, baz: { id: 3, name: 'baz' } } });
+    cache.write(partialOverlap, {
+      foo: { id: 100, baz: { id: 3, name: 'baz' } }
+    });
 
     expect(updates.length).to.eq(2);
     const [, update] = updates;
@@ -133,7 +136,9 @@ describe(`Cache#watch`, () => {
   it(`handles transitions from incomplete to complete`, () => {
     const updates: CacheInterface.DiffResult<any>[] = [];
     const cache2 = new Cache(strictConfig);
-    cache2.write(partialOverlap, { foo: { id: 1, baz: { id: 3, name: 'baz' } } });
+    cache2.write(partialOverlap, {
+      foo: { id: 1, baz: { id: 3, name: 'baz' } }
+    });
     cache2.watch(simpleGraph, newResult => updates.push(newResult));
     cache2.write(simpleGraph, { foo: { id: 1, bar: { id: 2, name: 'bar' } } });
 
@@ -143,5 +148,4 @@ describe(`Cache#watch`, () => {
     expect(initial.complete).to.eq(false);
     expect(update.complete).to.eq(true);
   });
-
 });

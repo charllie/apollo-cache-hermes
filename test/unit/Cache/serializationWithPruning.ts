@@ -3,8 +3,8 @@ import { CacheSnapshot } from '../../../src/CacheSnapshot';
 import { query, strictConfig } from '../../helpers';
 
 describe(`serialization with pruning`, () => {
-
-  const getAFooQuery = query(`query getAFoo($id: ID!) {
+  const getAFooQuery = query(
+    `query getAFoo($id: ID!) {
     one {
       two {
         three(id: $id, withExtra: true) {
@@ -12,35 +12,34 @@ describe(`serialization with pruning`, () => {
         }
       }
     }
-  }`, { id: 0 });
+  }`,
+    { id: 0 }
+  );
 
   let originalCacheSnapshot: CacheSnapshot, cache: Cache;
   beforeEach(() => {
     cache = new Cache(strictConfig);
-    cache.write(
-      getAFooQuery,
-      {
-        one: {
-          two: [
-            {
-              three: {
-                id: '30',
-                name: 'Three0',
-                extraValue: '30-42',
-              },
-            },
-            {
-              three: {
-                id: '31',
-                name: 'Three1',
-                extraValue: '31-42',
-              },
-            },
-            null,
-          ],
-        },
-      },
-    );
+    cache.write(getAFooQuery, {
+      one: {
+        two: [
+          {
+            three: {
+              id: '30',
+              name: 'Three0',
+              extraValue: '30-42'
+            }
+          },
+          {
+            three: {
+              id: '31',
+              name: 'Three1',
+              extraValue: '31-42'
+            }
+          },
+          null
+        ]
+      }
+    });
     originalCacheSnapshot = cache.getSnapshot();
   });
 
@@ -59,21 +58,18 @@ describe(`serialization with pruning`, () => {
       }
     }`);
 
-    cache.write(
-      muddyQuery,
-      {
-        viewer: {
-          id: 'tough007',
-          first: 'James',
-          last: 'Bond',
-          carrier: {
-            id: 'mi5',
-            hqCity: 'London',
-            phoneNo: '+44 20 7946 0820',
-          },
-        },
-      },
-    );
+    cache.write(muddyQuery, {
+      viewer: {
+        id: 'tough007',
+        first: 'James',
+        last: 'Bond',
+        carrier: {
+          id: 'mi5',
+          hqCity: 'London',
+          phoneNo: '+44 20 7946 0820'
+        }
+      }
+    });
 
     // extract but prune it with 'getAFooQuery'
     const extractResult = cache.extract(/* optimistic */ false, getAFooQuery);
@@ -89,7 +85,8 @@ describe(`serialization with pruning`, () => {
   it(`can extract the cache with slightly trimmed 'three' object`, () => {
     // set up an alternative query in which the 'three' object doesn't have
     // the 'name' field
-    const altPruneQuery = query(`query getAFoo($id: ID!) {
+    const altPruneQuery = query(
+      `query getAFoo($id: ID!) {
       one {
         two {
           three(id: $id, withExtra: true) {
@@ -97,32 +94,31 @@ describe(`serialization with pruning`, () => {
           }
         }
       }
-    }`, { id: 0 });
+    }`,
+      { id: 0 }
+    );
 
     // build the expected cache
     const expectedCache = new Cache(strictConfig);
-    expectedCache.write(
-      altPruneQuery,
-      {
-        one: {
-          two: [
-            {
-              three: {
-                id: '30',
-                extraValue: '30-42',
-              },
-            },
-            {
-              three: {
-                id: '31',
-                extraValue: '31-42',
-              },
-            },
-            null,
-          ],
-        },
-      },
-    );
+    expectedCache.write(altPruneQuery, {
+      one: {
+        two: [
+          {
+            three: {
+              id: '30',
+              extraValue: '30-42'
+            }
+          },
+          {
+            three: {
+              id: '31',
+              extraValue: '31-42'
+            }
+          },
+          null
+        ]
+      }
+    });
 
     // prune the original cache
     const extractResult = cache.extract(/* optimistic */ false, altPruneQuery);
@@ -135,5 +131,4 @@ describe(`serialization with pruning`, () => {
     // altPruneQuery
     expect(newCache.getSnapshot()).to.deep.eq(expectedCache.getSnapshot());
   });
-
 });

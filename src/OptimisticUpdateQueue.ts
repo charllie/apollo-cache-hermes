@@ -17,13 +17,12 @@ export interface OptimisticUpdate {
  * existing cache snapshots.
  */
 export class OptimisticUpdateQueue {
-
   constructor(
     /**
      * The queue of updates, in order of oldest (lowest precedence) to newest
      * (highest precedence).
      */
-    private _updates = [] as OptimisticUpdate[],
+    private _updates = [] as OptimisticUpdate[]
   ) {}
 
   /**
@@ -51,7 +50,10 @@ export class OptimisticUpdateQueue {
   /**
    * Applies the current optimistic updates to a snapshot.
    */
-  apply(context: CacheContext, snapshot: GraphSnapshot): { snapshot: GraphSnapshot, editedNodeIds: Set<NodeId> } {
+  apply(
+    context: CacheContext,
+    snapshot: GraphSnapshot
+  ): { snapshot: GraphSnapshot; editedNodeIds: Set<NodeId> } {
     const editor = new SnapshotEditor(context, snapshot);
     for (const update of this._updates) {
       for (const delta of update.deltas) {
@@ -61,5 +63,4 @@ export class OptimisticUpdateQueue {
 
     return editor.commit();
   }
-
 }

@@ -24,12 +24,16 @@ declare module 'graphql/language/ast' {
 }
 
 export namespace CacheContext {
-
   export type EntityIdForNode = (node: JsonObject) => EntityId | undefined;
   export type EntityIdForValue = (value: any) => EntityId | undefined;
-  export type EntityIdMapper = (node: JsonObject) => string | number | undefined;
+  export type EntityIdMapper = (
+    node: JsonObject
+  ) => string | number | undefined;
   export type EntityTransformer = (node: JsonObject) => void;
-  export type OnChangeCallback = (newCacheShapshot: CacheSnapshot, editedNodeIds: Set<String>) => void;
+  export type OnChangeCallback = (
+    newCacheShapshot: CacheSnapshot,
+    editedNodeIds: Set<String>
+  ) => void;
 
   /**
    * Expected to return an EntityId or undefined, but we loosen the restrictions
@@ -38,8 +42,8 @@ export namespace CacheContext {
   export type ResolverRedirect = (args: JsonObject) => any;
   export type ResolverRedirects = {
     [typeName: string]: {
-      [fieldName: string]: ResolverRedirect,
-    },
+      [fieldName: string]: ResolverRedirect;
+    };
   };
 
   /**
@@ -145,14 +149,12 @@ export namespace CacheContext {
      */
     logger?: ConsoleTracer.Logger;
   }
-
 }
 
 /**
  * Configuration and shared state used throughout the cache's operation.
  */
 export class CacheContext {
-
   /** Retrieve the EntityId for a given node, if any. */
   readonly entityIdForValue: CacheContext.EntityIdForValue;
 
@@ -190,18 +192,21 @@ export class CacheContext {
 
   constructor(config: CacheContext.Configuration = {}) {
     // Infer dev mode from NODE_ENV, by convention.
-    const nodeEnv = typeof process !== 'undefined' ? process.env.NODE_ENV : 'development';
+    const nodeEnv =
+      typeof process !== 'undefined' ? process.env.NODE_ENV : 'development';
 
     this.entityIdForValue = _makeEntityIdMapper(config.entityIdForNode);
     this.entityTransformer = config.entityTransformer;
-    this.freezeSnapshots = 'freeze' in config ? !!config.freeze : nodeEnv !== 'production';
+    this.freezeSnapshots =
+      'freeze' in config ? !!config.freeze : nodeEnv !== 'production';
 
     this.strict = typeof config.strict === 'boolean' ? config.strict : true;
     this.verbose = !!config.verbose;
     this.resolverRedirects = config.resolverRedirects || {};
     this.onChange = config.onChange;
     this.entityUpdaters = config.entityUpdaters || {};
-    this.tracer = config.tracer || new ConsoleTracer(!!config.verbose, config.logger);
+    this.tracer =
+      config.tracer || new ConsoleTracer(!!config.verbose, config.logger);
 
     this.addTypename = config.addTypename || false;
   }
@@ -247,17 +252,20 @@ export class CacheContext {
 
     const updateRaw: RawOperation = {
       ...raw,
-      document: this.transformDocument(raw.document),
+      document: this.transformDocument(raw.document)
     };
 
     const info = this._queryInfo(cacheKey, updateRaw);
-    const fullVariables = { ...info.variableDefaults, ...updateRaw.variables } as JsonObject;
+    const fullVariables = {
+      ...info.variableDefaults,
+      ...updateRaw.variables
+    } as JsonObject;
     const operation = {
       info,
       rootId: updateRaw.rootId,
       parsedQuery: expandVariables(info.parsed, fullVariables),
       isStatic: !areChildrenDynamic(info.parsed),
-      variables: updateRaw.variables,
+      variables: updateRaw.variables
     };
     operationInstances.push(operation);
 
@@ -273,14 +281,13 @@ export class CacheContext {
     }
     return this._queryInfoMap.get(cacheKey)!;
   }
-
 }
 
 /**
  * Wrap entityIdForNode so that it coerces all values to strings.
  */
 export function _makeEntityIdMapper(
-  mapper: CacheContext.EntityIdMapper = defaultEntityIdMapper,
+  mapper: CacheContext.EntityIdMapper = defaultEntityIdMapper
 ): CacheContext.EntityIdForValue {
   return function entityIdForNode(node: JsonObject) {
     if (!isObject(node)) return undefined;
@@ -297,7 +304,10 @@ export function defaultEntityIdMapper(node: { id?: any }) {
   return node.id;
 }
 
-export function operationCacheKey(document: DocumentNode, fragmentName?: string) {
+export function operationCacheKey(
+  document: DocumentNode,
+  fragmentName?: string
+) {
   if (fragmentName) {
     return `${fragmentName}❖${document.loc!.source.body}`;
   }

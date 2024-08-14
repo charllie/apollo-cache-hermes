@@ -14,45 +14,59 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // It just isn't very fruitful to unit test the individual steps of the write
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
 
   describe(`top-level parameterized reference`, () => {
-
-    let snapshot: GraphSnapshot, editedNodeIds: Set<NodeId>, parameterizedId: NodeId;
+    let snapshot: GraphSnapshot,
+      editedNodeIds: Set<NodeId>,
+      parameterizedId: NodeId;
     beforeAll(() => {
-      const parameterizedQuery = query(`
+      const parameterizedQuery = query(
+        `
         query getAFoo($id: ID!) {
           foo(id: $id, withExtra: true) {
             id name extra
           }
-        }`, { id: 1 });
+        }`,
+        { id: 1 }
+      );
 
-      parameterizedId = nodeIdForParameterizedValue(QueryRootId, ['foo'], { id: 1, withExtra: true });
+      parameterizedId = nodeIdForParameterizedValue(QueryRootId, ['foo'], {
+        id: 1,
+        withExtra: true
+      });
 
       const result = write(context, empty, parameterizedQuery, {
         foo: {
           id: 1,
           name: 'Foo',
-          extra: false,
-        },
+          extra: false
+        }
       });
       snapshot = result.snapshot;
       editedNodeIds = result.editedNodeIds;
     });
 
     it(`writes a node for the new entity`, () => {
-      jestExpect(snapshot.getNodeData('1')).toEqual({ id: 1, name: 'Foo', extra: false });
+      jestExpect(snapshot.getNodeData('1')).toEqual({
+        id: 1,
+        name: 'Foo',
+        extra: false
+      });
     });
 
     it(`writes a node for the field that points to the entity's value`, () => {
-      jestExpect(snapshot.getNodeData(parameterizedId)).toBe(snapshot.getNodeData('1'));
+      jestExpect(snapshot.getNodeData(parameterizedId)).toBe(
+        snapshot.getNodeData('1')
+      );
     });
 
     it(`creates an outgoing reference from the field's container`, () => {
       const queryRoot = snapshot.getNodeSnapshot(QueryRootId)!;
-      jestExpect(queryRoot.outbound).toEqual([{ id: parameterizedId, path: ['foo'] }]);
+      jestExpect(queryRoot.outbound).toEqual([
+        { id: parameterizedId, path: ['foo'] }
+      ]);
     });
 
     it(`creates an inbound reference to the field's container`, () => {
@@ -71,12 +85,15 @@ describe(`operations.write`, () => {
     });
 
     it(`does not expose the parameterized field directly from its container`, () => {
-      jestExpect(_.get(snapshot.getNodeData(QueryRootId), 'foo')).toBe(undefined);
+      jestExpect(_.get(snapshot.getNodeData(QueryRootId), 'foo')).toBe(
+        undefined
+      );
     });
 
     it(`marks the new field and entity as edited`, () => {
-      jestExpect(Array.from(editedNodeIds)).toEqual(jestExpect.arrayContaining([parameterizedId, '1']));
+      jestExpect(Array.from(editedNodeIds)).toEqual(
+        jestExpect.arrayContaining([parameterizedId, '1'])
+      );
     });
-
   });
 });

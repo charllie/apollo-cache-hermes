@@ -3,7 +3,6 @@ import { CacheContext } from '../../../../src/context/CacheContext';
 describe(`context.CacheContext`, () => {
   describe(`entityIdForNode`, () => {
     describe(`default behavior`, () => {
-
       let context: CacheContext;
       beforeAll(() => {
         context = new CacheContext();
@@ -21,8 +20,12 @@ describe(`context.CacheContext`, () => {
         expect(context.entityIdForValue({ id: true })).to.eq(undefined);
         expect(context.entityIdForValue({ id: false })).to.eq(undefined);
         expect(context.entityIdForValue({ id: null })).to.eq(undefined);
-        expect(context.entityIdForValue({ id: undefined } as any)).to.eq(undefined);
-        expect(context.entityIdForValue({ id: Symbol.iterator } as any)).to.eq(undefined);
+        expect(context.entityIdForValue({ id: undefined } as any)).to.eq(
+          undefined
+        );
+        expect(context.entityIdForValue({ id: Symbol.iterator } as any)).to.eq(
+          undefined
+        );
         expect(context.entityIdForValue({ id: {} })).to.eq(undefined);
         expect(context.entityIdForValue({ id() {} } as any)).to.eq(undefined);
         expect(context.entityIdForValue({ id: { id: 'hi' } })).to.eq(undefined);
@@ -37,16 +40,14 @@ describe(`context.CacheContext`, () => {
         expect(context.entityIdForValue([] as any)).to.eq(undefined);
         expect(context.entityIdForValue((() => {}) as any)).to.eq(undefined);
       });
-
     });
 
     describe(`custom mapper`, () => {
-
       let context: CacheContext, mapper: jest.Mock<any>;
       beforeAll(() => {
         mapper = jest.fn();
         context = new CacheContext({
-          entityIdForNode: mapper,
+          entityIdForNode: mapper
         });
       });
 

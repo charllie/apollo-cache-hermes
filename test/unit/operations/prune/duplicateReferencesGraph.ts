@@ -1,6 +1,10 @@
 import { extract, prune } from '../../../../src/operations';
 import { Serializable, StaticNodeId } from '../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext, query } from '../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext,
+  query
+} from '../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
@@ -15,11 +19,12 @@ describe(`operations.prune`, () => {
           { id: 'a', name: 'nameA', bar: { id: 1, stuff: 'payload' } },
           { id: 'b', name: 'nameB', bar: { id: 1, stuff: 'payload' } },
           { id: 'a', name: 'nameA', bar: { id: 1, stuff: 'payload' } },
-          { id: 'b', name: 'nameB', bar: { id: 1, stuff: 'payload' } },
+          { id: 'b', name: 'nameB', bar: { id: 1, stuff: 'payload' } }
         ],
         baz: {
-          id: 'a', bar: { id: 1, stuff: 'payload' },
-        },
+          id: 'a',
+          bar: { id: 1, stuff: 'payload' }
+        }
       },
       `{
         foo {
@@ -59,50 +64,49 @@ describe(`operations.prune`, () => {
           { id: 'b', path: ['foo', 2] },
           { id: 'a', path: ['foo', 3] },
           { id: 'b', path: ['foo', 4] },
-          { id: 'a', path: ['baz'] },
+          { id: 'a', path: ['baz'] }
         ],
         data: {
           foo: [undefined, undefined, undefined, undefined, undefined],
-          baz: undefined,
-        },
+          baz: undefined
+        }
       },
       '1': {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         inbound: [
           { id: 'a', path: ['bar'] },
-          { id: 'b', path: ['bar'] },
+          { id: 'b', path: ['bar'] }
         ],
         data: {
-          id: 1,
-        },
+          id: 1
+        }
       },
-      'a': {
+      a: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         inbound: [
           { id: QueryRootId, path: ['foo', 0] },
           { id: QueryRootId, path: ['foo', 1] },
           { id: QueryRootId, path: ['foo', 3] },
-          { id: QueryRootId, path: ['baz'] },
+          { id: QueryRootId, path: ['baz'] }
         ],
         outbound: [{ id: '1', path: ['bar'] }],
         data: {
           id: 'a',
-          bar: undefined,
-        },
+          bar: undefined
+        }
       },
-      'b': {
+      b: {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         inbound: [
           { id: QueryRootId, path: ['foo', 2] },
-          { id: QueryRootId, path: ['foo', 4] },
+          { id: QueryRootId, path: ['foo', 4] }
         ],
         outbound: [{ id: '1', path: ['bar'] }],
         data: {
           id: 'b',
-          bar: undefined,
-        },
-      },
+          bar: undefined
+        }
+      }
     });
   });
-
 });

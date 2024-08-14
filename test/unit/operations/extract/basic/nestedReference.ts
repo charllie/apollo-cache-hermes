@@ -1,12 +1,14 @@
 import { extract } from '../../../../../src/operations/extract';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`nested references hanging off of a root`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
@@ -14,9 +16,9 @@ describe(`operations.extract`, () => {
         {
           one: {
             two: {
-              three: { id: 0 },
-            },
-          },
+              three: { id: 0 }
+            }
+          }
         },
         `{ 
             one {
@@ -39,18 +41,17 @@ describe(`operations.extract`, () => {
           data: {
             one: {
               two: {
-                three: undefined,
-              },
-            },
-          },
+                three: undefined
+              }
+            }
+          }
         },
         '0': {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: QueryRootId, path: ['one', 'two', 'three'] }],
-          data: { id: 0 },
-        },
+          data: { id: 0 }
+        }
       });
     });
-
   });
 });

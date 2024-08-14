@@ -7,11 +7,15 @@ import { DocumentNode } from '../util';
 /**
  * Builds a query.
  */
-export function buildRawOperationFromQuery(document: DocumentNode, variables?: JsonObject, rootId?: NodeId): RawOperation {
+export function buildRawOperationFromQuery(
+  document: DocumentNode,
+  variables?: JsonObject,
+  rootId?: NodeId
+): RawOperation {
   return {
     rootId: rootId || StaticNodeId.QueryRoot,
     document,
-    variables,
+    variables
   };
 }
 
@@ -26,6 +30,6 @@ export function buildRawOperationFromFragment(
     document: getFragmentQueryDocument(fragmentDocument, fragmentName),
     variables,
     fragmentName,
-    fromFragmentDocument: true,
+    fromFragmentDocument: true
   };
 }

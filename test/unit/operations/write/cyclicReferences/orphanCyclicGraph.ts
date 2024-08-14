@@ -9,7 +9,6 @@ const { QueryRoot: QueryRootId } = StaticNodeId;
 // workflow in isolation, given the contextual state that must be passed around.
 describe(`operations.write`, () => {
   describe(`edit cyclic graph`, () => {
-
     let snapshot: GraphSnapshot, editedNodeIds: Set<NodeId>;
     beforeAll(() => {
       const cyclicRefQuery = `{
@@ -34,18 +33,14 @@ describe(`operations.write`, () => {
               id: 2,
               name: 'Bar',
               fizz: { id: 1 },
-              buzz: { id: 2 },
-            },
-          },
+              buzz: { id: 2 }
+            }
+          }
         },
         cyclicRefQuery
       ).snapshot;
 
-      const result = updateSnapshot(
-        baseline,
-        { foo: null },
-        cyclicRefQuery
-      );
+      const result = updateSnapshot(baseline, { foo: null }, cyclicRefQuery);
 
       snapshot = result.snapshot;
       editedNodeIds = result.editedNodeIds;
@@ -57,11 +52,15 @@ describe(`operations.write`, () => {
 
     // TODO: Detect this case, and actually make it work.  Mark & sweep? :(
     it.skip(`garbage collects the orphaned subgraph`, () => {
-      jestExpect(snapshot.allNodeIds()).toEqual(jestExpect.arrayContaining([QueryRootId]));
+      jestExpect(snapshot.allNodeIds()).toEqual(
+        jestExpect.arrayContaining([QueryRootId])
+      );
     });
 
     it.skip(`marks all nodes as edited`, () => {
-      jestExpect(Array.from(editedNodeIds)).toEqual(jestExpect.arrayContaining([QueryRootId, '1', '2']));
+      jestExpect(Array.from(editedNodeIds)).toEqual(
+        jestExpect.arrayContaining([QueryRootId, '1', '2'])
+      );
     });
   });
 });

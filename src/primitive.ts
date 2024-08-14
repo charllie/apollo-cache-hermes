@@ -23,7 +23,7 @@ export type PathPart = number | string;
  * A JavaScript constructor.
  */
 export interface Constructor<TClass extends object> {
-  new(...args: any[]): TClass;
+  new (...args: any[]): TClass;
   prototype: TClass;
 }
 
@@ -31,23 +31,28 @@ export interface Constructor<TClass extends object> {
  * A partial object, applied recursively.
  */
 export type DeepPartial<TType> = {
-  [Key in keyof TType]?: DeepPartial<TType[Key]>
+  [Key in keyof TType]?: DeepPartial<TType[Key]>;
 };
 
 /**
  * A readonly object, applied recursively.
  */
 export type DeepReadonly<TType> = {
-  readonly [Key in keyof TType]: DeepReadonly<TType[Key]>
+  readonly [Key in keyof TType]: DeepReadonly<TType[Key]>;
 };
 
 /**
  * Represents a complex object that can contain values of a specific type,
  * that can be rooted within objects/arrays of arbitrary depth.
  */
-export type NestedValue<TValue> = TValue | NestedArray<TValue> | NestedObject<TValue>;
+export type NestedValue<TValue> =
+  | TValue
+  | NestedArray<TValue>
+  | NestedObject<TValue>;
 export interface NestedArray<TValue> extends Array<NestedValue<TValue>> {}
-export interface NestedObject<TValue> { [key: string]: NestedValue<TValue> }
+export interface NestedObject<TValue> {
+  [key: string]: NestedValue<TValue>;
+}
 
 // JSON
 

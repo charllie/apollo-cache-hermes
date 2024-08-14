@@ -1,12 +1,14 @@
 import { extract } from '../../../../../src/operations';
 import { nodeIdForParameterizedValue } from '../../../../../src/operations/SnapshotEditor';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`2d array of parameterized references`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
@@ -16,16 +18,12 @@ describe(`operations.extract`, () => {
             elements: [
               [
                 { id: 'a', value: 1 },
-                { id: 'b', value: 2 },
+                { id: 'b', value: 2 }
               ],
-              [
-                { id: 'c', value: 3 },
-                { id: 'd', value: 4 },
-                null,
-              ],
-              null,
-            ],
-          },
+              [{ id: 'c', value: 3 }, { id: 'd', value: 4 }, null],
+              null
+            ]
+          }
         },
         `query getTable($tableName: String!) {
           rows {
@@ -36,7 +34,7 @@ describe(`operations.extract`, () => {
           }
         }`,
         cacheContext,
-        { tableName: 'This is table name' },
+        { tableName: 'This is table name' }
       );
 
       extractResult = extract(snapshot, cacheContext);
@@ -46,13 +44,13 @@ describe(`operations.extract`, () => {
       const parameterizedId = nodeIdForParameterizedValue(
         QueryRootId,
         ['rows', 'elements'],
-        { table: 'This is table name' },
+        { table: 'This is table name' }
       );
 
       jestExpect(extractResult).toEqual({
         [QueryRootId]: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
-          outbound: [{ id: parameterizedId, path: ['rows', 'elements'] }],
+          outbound: [{ id: parameterizedId, path: ['rows', 'elements'] }]
         },
         [parameterizedId]: {
           type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
@@ -61,43 +59,31 @@ describe(`operations.extract`, () => {
             { id: 'a', path: [0, 0] },
             { id: 'b', path: [0, 1] },
             { id: 'c', path: [1, 0] },
-            { id: 'd', path: [1, 1] },
+            { id: 'd', path: [1, 1] }
           ],
-          data: [
-            [
-              undefined,
-              undefined,
-            ],
-            [
-              undefined,
-              undefined,
-              null,
-            ],
-            null,
-          ],
+          data: [[undefined, undefined], [undefined, undefined, null], null]
         },
-        'a': {
+        a: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: parameterizedId, path: [0, 0] }],
-          data: { id: 'a', value: 1 },
+          data: { id: 'a', value: 1 }
         },
-        'b': {
+        b: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: parameterizedId, path: [0, 1] }],
-          data: { id: 'b', value: 2 },
+          data: { id: 'b', value: 2 }
         },
-        'c': {
+        c: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: parameterizedId, path: [1, 0] }],
-          data: { id: 'c', value: 3 },
+          data: { id: 'c', value: 3 }
         },
-        'd': {
+        d: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: parameterizedId, path: [1, 1] }],
-          data: { id: 'd', value: 4 },
-        },
+          data: { id: 'd', value: 4 }
+        }
       });
     });
-
   });
 });

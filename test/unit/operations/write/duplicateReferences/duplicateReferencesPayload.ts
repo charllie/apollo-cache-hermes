@@ -7,7 +7,6 @@ import { query, strictConfig } from '../../../../helpers';
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
   const listQuery = query(`{
@@ -22,7 +21,6 @@ describe(`operations.write`, () => {
   }`);
 
   describe(`write duplicate-references payload`, () => {
-
     let snapshot: GraphSnapshot;
     beforeAll(() => {
       const result = write(context, empty, listQuery, {
@@ -31,11 +29,12 @@ describe(`operations.write`, () => {
           { id: 'a', bar: { id: 1 } },
           { id: 'b', bar: { id: 1 } },
           { id: 'a', bar: { id: 1 } },
-          { id: 'b', bar: { id: 1 } },
+          { id: 'b', bar: { id: 1 } }
         ],
         baz: {
-          id: 'a', bar: { id: 1 },
-        },
+          id: 'a',
+          bar: { id: 1 }
+        }
       });
       snapshot = result.snapshot;
     });
@@ -47,28 +46,31 @@ describe(`operations.write`, () => {
           { id: 'a', bar: { id: 1 } },
           { id: 'b', bar: { id: 1 } },
           { id: 'a', bar: { id: 1 } },
-          { id: 'b', bar: { id: 1 } },
+          { id: 'b', bar: { id: 1 } }
         ],
         baz: {
-          id: 'a', bar: { id: 1 },
-        },
+          id: 'a',
+          bar: { id: 1 }
+        }
       });
     });
 
     it(`doesn't insert duplicate outbound references`, () => {
-      jestExpect(snapshot.getNodeSnapshot('a')!.outbound).toEqual(jestExpect.arrayContaining([
-        { id: '1', path: ['bar'] },
-      ]));
-      jestExpect(snapshot.getNodeSnapshot('b')!.outbound).toEqual(jestExpect.arrayContaining([
-        { id: '1', path: ['bar'] },
-      ]));
+      jestExpect(snapshot.getNodeSnapshot('a')!.outbound).toEqual(
+        jestExpect.arrayContaining([{ id: '1', path: ['bar'] }])
+      );
+      jestExpect(snapshot.getNodeSnapshot('b')!.outbound).toEqual(
+        jestExpect.arrayContaining([{ id: '1', path: ['bar'] }])
+      );
     });
 
     it(`doesn't insert duplicate inbound references for targets`, () => {
-      jestExpect(snapshot.getNodeSnapshot('1')!.inbound).toEqual(jestExpect.arrayContaining([
-        { id: 'a', path: ['bar'] },
-        { id: 'b', path: ['bar'] },
-      ]));
+      jestExpect(snapshot.getNodeSnapshot('1')!.inbound).toEqual(
+        jestExpect.arrayContaining([
+          { id: 'a', path: ['bar'] },
+          { id: 'b', path: ['bar'] }
+        ])
+      );
     });
   });
 });

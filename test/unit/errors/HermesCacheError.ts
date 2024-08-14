@@ -1,7 +1,6 @@
 import { HermesCacheError } from '../../../src';
 
 describe(`errors.CacheError`, () => {
-
   class ChildError extends HermesCacheError {}
 
   it(`it can be constructed directly`, () => {
@@ -17,7 +16,10 @@ describe(`errors.CacheError`, () => {
   });
 
   it(`injects infoUrls if requested`, () => {
-    const error = new ChildError({ message: `kaboom`, infoUrl: 'http://foo.bar' });
+    const error = new ChildError({
+      message: `kaboom`,
+      infoUrl: 'http://foo.bar'
+    });
     expect(error.message).to.include('kaboom');
     expect(error.message).to.include('http://foo.bar');
   });
@@ -26,5 +28,4 @@ describe(`errors.CacheError`, () => {
     const error = new ChildError({ message: `kaboom` });
     expect(error.message).to.eq('kaboom');
   });
-
 });

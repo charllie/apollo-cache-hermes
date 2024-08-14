@@ -6,7 +6,6 @@ import { fragmentMapForDocument, getOperationOrDie } from '../../../src/util';
 import { strictConfig } from '../../helpers';
 
 describe(`parseQuery with queries with directives`, () => {
-
   const context = new CacheContext(strictConfig);
   function parseOperation(operationString: string) {
     const document = gql(operationString);
@@ -49,5 +48,4 @@ describe(`parseQuery with queries with directives`, () => {
       new Set(['varA', 'varB', 'varC', 'varD'])
     );
   });
-
 });

@@ -5,7 +5,6 @@ import { CacheContext } from '../../../../src/context/CacheContext';
 import { strictConfig } from '../../../helpers/context';
 
 describe(`writeFragment when using multiple fragments without fragmentName`, () => {
-
   let hermes: Hermes;
   beforeAll(() => {
     hermes = new Hermes(new CacheContext(strictConfig));
@@ -31,10 +30,9 @@ describe(`writeFragment when using multiple fragments without fragmentName`, () 
         data: {
           id: 123,
           name: 'Gouda',
-          __typename: 'Viewer',
-        },
+          __typename: 'Viewer'
+        }
       });
     }).to.throw(/Found 2 fragments. `fragmentName` must be provided/i);
   });
-
 });

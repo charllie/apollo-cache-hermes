@@ -1,13 +1,15 @@
 import { extract } from '../../../../../src/operations/extract';
 import { nodeIdForParameterizedValue } from '../../../../../src/operations/SnapshotEditor';
 import { Serializable, StaticNodeId } from '../../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext } from '../../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext
+} from '../../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.extract`, () => {
   describe(`nested parameterized value with array of nested references`, () => {
-
     let extractResult: Serializable.GraphSnapshot;
     beforeAll(() => {
       const cacheContext = createStrictCacheContext();
@@ -18,18 +20,18 @@ describe(`operations.extract`, () => {
               {
                 three: {
                   id: 31,
-                  four: { five: 1 },
-                },
+                  four: { five: 1 }
+                }
               },
               {
                 three: {
                   id: 32,
-                  four: { five: 1 },
-                },
+                  four: { five: 1 }
+                }
               },
-              null,
-            ],
-          },
+              null
+            ]
+          }
         },
         `query nested($id: ID!) {
           one {
@@ -60,61 +62,60 @@ describe(`operations.extract`, () => {
       const nestedParameterizedValueId0 = nodeIdForParameterizedValue(
         '31',
         ['four'],
-        { extra: true },
+        { extra: true }
       );
 
       const nestedParameterizedValueId1 = nodeIdForParameterizedValue(
         '32',
         ['four'],
-        { extra: true },
+        { extra: true }
       );
 
       jestExpect(extractResult).toEqual({
         [QueryRootId]: {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
-          outbound: [{ id: parameterizedTopContainerId, path: ['one', 'two'] }],
+          outbound: [{ id: parameterizedTopContainerId, path: ['one', 'two'] }]
         },
         [parameterizedTopContainerId]: {
           type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
           inbound: [{ id: QueryRootId, path: ['one', 'two'] }],
           outbound: [
             { id: '31', path: [0, 'three'] },
-            { id: '32', path: [1, 'three'] },
+            { id: '32', path: [1, 'three'] }
           ],
-          data: [{ three: undefined }, { three: undefined }, null],
+          data: [{ three: undefined }, { three: undefined }, null]
         },
         '31': {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: parameterizedTopContainerId, path: [0, 'three'] }],
           outbound: [{ id: nestedParameterizedValueId0, path: ['four'] }],
           data: {
-            id: 31,
-          },
+            id: 31
+          }
         },
         [nestedParameterizedValueId0]: {
           type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
           inbound: [{ id: '31', path: ['four'] }],
           data: {
-            five: 1,
-          },
+            five: 1
+          }
         },
         '32': {
           type: Serializable.NodeSnapshotType.EntitySnapshot,
           inbound: [{ id: parameterizedTopContainerId, path: [1, 'three'] }],
           outbound: [{ id: nestedParameterizedValueId1, path: ['four'] }],
           data: {
-            id: 32,
-          },
+            id: 32
+          }
         },
         [nestedParameterizedValueId1]: {
           type: Serializable.NodeSnapshotType.ParameterizedValueSnapshot,
           inbound: [{ id: '32', path: ['four'] }],
           data: {
-            five: 1,
-          },
-        },
+            five: 1
+          }
+        }
       });
     });
-
   });
 });

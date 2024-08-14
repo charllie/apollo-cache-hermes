@@ -1,6 +1,10 @@
 import { extract, prune } from '../../../../src/operations';
 import { Serializable, StaticNodeId } from '../../../../src/schema';
-import { createGraphSnapshot, createStrictCacheContext, query } from '../../../helpers';
+import {
+  createGraphSnapshot,
+  createStrictCacheContext,
+  query
+} from '../../../helpers';
 
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
@@ -13,14 +17,14 @@ describe(`operations.prune`, () => {
         viewer: [
           {
             id: 123,
-            name: 'Gouda',
+            name: 'Gouda'
           },
           {
             id: 456,
-            name: 'Brie',
+            name: 'Brie'
           },
-          null,
-        ],
+          null
+        ]
       },
       `{ viewer { id name } }`,
       cacheContext
@@ -39,23 +43,22 @@ describe(`operations.prune`, () => {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         outbound: [
           { id: '123', path: ['viewer', 0] },
-          { id: '456', path: ['viewer', 1] },
+          { id: '456', path: ['viewer', 1] }
         ],
         data: {
-          viewer: [undefined, undefined, null],
-        },
+          viewer: [undefined, undefined, null]
+        }
       },
       '123': {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         inbound: [{ id: QueryRootId, path: ['viewer', 0] }],
-        data: { id: 123 },
+        data: { id: 123 }
       },
       '456': {
         type: Serializable.NodeSnapshotType.EntitySnapshot,
         inbound: [{ id: QueryRootId, path: ['viewer', 1] }],
-        data: { id: 456 },
-      },
+        data: { id: 456 }
+      }
     });
   });
-
 });

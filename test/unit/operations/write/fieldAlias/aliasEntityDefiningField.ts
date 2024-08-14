@@ -8,7 +8,6 @@ import { query, strictConfig } from '../../../../helpers';
 const { QueryRoot: QueryRootId } = StaticNodeId;
 
 describe(`operations.write`, () => {
-
   const context = new CacheContext(strictConfig);
   const empty = new GraphSnapshot();
 
@@ -25,8 +24,8 @@ describe(`operations.write`, () => {
       snapshot = write(context, empty, aliasQuery, {
         user: {
           userId: 0,
-          FirstName: 'Foo',
-        },
+          FirstName: 'Foo'
+        }
       }).snapshot;
     });
 
@@ -34,8 +33,8 @@ describe(`operations.write`, () => {
       jestExpect(snapshot.getNodeData(QueryRootId)).toEqual({
         user: {
           id: 0,
-          name: 'Foo',
-        },
+          name: 'Foo'
+        }
       });
     });
 
@@ -45,18 +44,19 @@ describe(`operations.write`, () => {
           {
             user: {
               id: 0,
-              name: 'Foo',
-            },
+              name: 'Foo'
+            }
           },
           /* inbound */ undefined,
-          /* outbound */ undefined,
+          /* outbound */ undefined
         )
       );
     });
 
     it(`checks only one entity node on RootQuery`, () => {
-      jestExpect(snapshot.allNodeIds()).toEqual(jestExpect.arrayContaining([QueryRootId]));
+      jestExpect(snapshot.allNodeIds()).toEqual(
+        jestExpect.arrayContaining([QueryRootId])
+      );
     });
-
   });
 });
